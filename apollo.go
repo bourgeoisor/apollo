@@ -5,33 +5,29 @@ import (
     "log"
 )
 
-type apollo struct {
+type Apollo struct {
     running bool
     width int
     height int
     events chan termbox.Event
-    settings map[string]string
+    configuration *Configuration
 }
 
-func create() *apollo {
-    settings := map[string]string{
-        "sett": "value",
-    }
-
+func createApollo() *Apollo {
     width, height := termbox.Size()
 
-    a := &apollo{
+    a := &Apollo{
         running: true,
         width: width,
         height: height,
         events: make(chan termbox.Event, 20),
-        settings: settings,
+        configuration: createConfiguration(),
     }
 
     return a
 }
 
-func (a *apollo) handleEvent(ev *termbox.Event) error {
+func (a *Apollo) handleEvent(ev *termbox.Event) error {
     switch ev.Type {
     case termbox.EventKey:
         a.handleKeyEvent(ev)
@@ -44,17 +40,17 @@ func (a *apollo) handleEvent(ev *termbox.Event) error {
     return nil
 }
 
-func (a *apollo) handleKeyEvent(ev *termbox.Event) {
+func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
     if ev.Key == termbox.KeyCtrlC {
         a.running = false
     }
 }
 
-func (a *apollo) draw() {
-
+func (a *Apollo) draw() {
+    termbox.Flush()
 }
 
-func (a *apollo) loop() {
+func (a *Apollo) loop() {
     go func() {
         for {
             a.events <- termbox.PollEvent()
@@ -82,6 +78,6 @@ func main() {
 
     termbox.SetInputMode(termbox.InputAlt)
 
-    apollo := create()
+    apollo := createApollo()
     apollo.loop()
 }
