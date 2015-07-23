@@ -8,14 +8,17 @@ import (
 
 type Configuration struct {
     Test string
+    Testb bool
 }
 
 func createConfiguration() *Configuration {
     c := &Configuration{
         Test: "nope.avi",
+        Testb: true,
     }
 
     c.load()
+    c.save()
 
     return c
 }
@@ -33,5 +36,13 @@ func (c *Configuration) load() {
 }
 
 func (c *Configuration) save() {
+    cont, err := json.Marshal(c)
+    if err != nil {
+        log.Fatal(err)
+    }
 
+    err = ioutil.WriteFile("configuration.json", cont, 0644)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
