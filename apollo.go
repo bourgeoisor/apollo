@@ -49,6 +49,17 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 }
 
 func (a *Apollo) draw() {
+    termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+
+    runes := []rune("top status bar")
+    for i := 0; i < a.width; i++ {
+        if i < len(runes) {
+            termbox.SetCell(i, 0, runes[i], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
+        } else {
+            termbox.SetCell(i, 0, ' ', termbox.ColorDefault, termbox.ColorBlack | termbox.AttrBold)
+        }
+    }
+
     termbox.Flush()
 }
 
