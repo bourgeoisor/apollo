@@ -11,6 +11,7 @@ type Apollo struct {
     height int
     events chan termbox.Event
     configuration *Configuration
+    database *Database
 }
 
 func createApollo() *Apollo {
@@ -22,6 +23,7 @@ func createApollo() *Apollo {
         height: height,
         events: make(chan termbox.Event, 20),
         configuration: createConfiguration(),
+        database: createDatabase(),
     }
 
     return a
