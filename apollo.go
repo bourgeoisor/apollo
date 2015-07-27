@@ -2,8 +2,17 @@ package main
 
 import (
     "github.com/nsf/termbox-go"
+    "strconv"
     "log"
 )
+
+type Tab interface {
+    Name() string
+    Status() string
+    HandleKeyEvent(*termbox.Event) bool
+    Draw()
+    Query(string)
+}
 
 type Apollo struct {
     running bool
@@ -12,10 +21,14 @@ type Apollo struct {
     events chan termbox.Event
     configuration *Configuration
     database *Database
+    currentTab int
+    tabs []Tab
 }
 
 func createApollo() *Apollo {
     width, height := termbox.Size()
+
+    var tabs []Tab
 
     a := &Apollo{
         running: true,
@@ -24,7 +37,11 @@ func createApollo() *Apollo {
         events: make(chan termbox.Event, 20),
         configuration: createConfiguration(),
         database: createDatabase(),
+        currentTab: 0,
+        tabs: tabs,
     }
+
+    a.tabs = append(tabs, Tab(createStatusTab(a)))
 
     return a
 }
@@ -51,12 +68,26 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 func (a *Apollo) draw() {
     termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-    runes := []rune("top status bar")
+    runes := []rune("top status bar - " + a.tabs[a.currentTab].Status())
     for i := 0; i < a.width; i++ {
         if i < len(runes) {
             termbox.SetCell(i, 0, runes[i], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
         } else {
             termbox.SetCell(i, 0, ' ', termbox.ColorDefault, termbox.ColorBlack | termbox.AttrBold)
+        }
+    }
+
+    a.tabs[a.currentTab].Draw()
+
+    for i := 0; i < a.width; i++ {
+        termbox.SetCell(i, a.height - 2, ' ', termbox.ColorDefault, termbox.ColorBlack | termbox.AttrBold)
+    }
+    x := 0
+    for i := 0; i < len(a.tabs); i++ {
+        runes := []rune(strconv.Itoa(i+1) + "." + a.tabs[i].Name() + " ")
+        for j := 0; j < len(runes); j++ {
+            termbox.SetCell(x, a.height - 2, runes[j], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
+            x++
         }
     }
 
