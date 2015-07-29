@@ -70,14 +70,24 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 
     if !handled {
         switch ev.Key {
-        case termbox.KeyEnter:
-            if a.inputActive {
-                a.inputActive = false
-            } else {
-                a.inputActive = true
-            }
         case termbox.KeyCtrlC:
             a.running = false
+        case termbox.KeyEnter:
+            if len(a.input) > 0 {
+                if a.input[0] == '/' {
+                    a.handleCommand()
+                } else {
+                    a.tabs[a.currentTab].Query(string(a.input))
+                }
+                a.input = a.input[:0]
+                a.inputCursor = 0
+            } else {
+                if a.inputActive {
+                    a.inputActive = false
+                } else {
+                    a.inputActive = true
+                }
+            }
         case termbox.KeyBackspace, termbox.KeyBackspace2:
             if a.inputActive {
                 if a.inputCursor > 0 {
