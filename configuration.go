@@ -46,3 +46,7 @@ func (c *Configuration) save() {
         log.Fatal(err)
     }
 }
+
+func (c *Configuration) set(option string, value string) {
+    
+}

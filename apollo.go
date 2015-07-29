@@ -20,8 +20,8 @@ type Apollo struct {
     width int
     height int
     events chan termbox.Event
-    configuration *Configuration
-    database *Database
+    c *Configuration
+    d *Database
     currentTab int
     tabs []Tab
     input []rune
@@ -39,8 +39,8 @@ func createApollo() *Apollo {
         width: width,
         height: height,
         events: make(chan termbox.Event, 20),
-        configuration: createConfiguration(),
-        database: createDatabase(),
+        c: createConfiguration(),
+        d: createDatabase(),
         tabs: tabs,
     }
 
@@ -199,6 +199,40 @@ func (a *Apollo) loop() {
             }
             a.draw()
         }
+    }
+}
+
+func (a *Apollo) log(str string) {
+    a.tabs[0].Query(str)
+}
+
+func (a *Apollo) logError(str string) {
+    a.log("ERROR: " + str)
+}
+
+func (a *Apollo) openTab(name string) {
+    for i := 0; i < len(a.tabs); i++ {
+        if a.tabs[i].Name() == name {
+            a.currentTab = i
+            return
+        }
+    }
+
+    switch name {
+    //case movies:
+    //    a.tabs = append(a.tabs, Tab(NewMoviesTab()))
+    //    a.currentTab = len(a.tabs) - 1
+    default:
+        a.logError("Tab doesn't exist.")
+    }
+}
+
+func (a *Apollo) closeCurrentTab() {
+    if a.currentTab != 0 {
+        a.tabs = append(a.tabs[:a.currentTab], a.tabs[a.currentTab+1:]...)
+        a.currentTab--
+    } else {
+        a.logError("Cannot close the status tab.")
     }
 }
 
