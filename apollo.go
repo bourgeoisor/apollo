@@ -3,6 +3,7 @@ package main
 import (
     "github.com/nsf/termbox-go"
     "strconv"
+    "unicode"
     "log"
 )
 
@@ -23,6 +24,9 @@ type Apollo struct {
     database *Database
     currentTab int
     tabs []Tab
+    input []rune
+    inputCursor int
+    inputActive bool
 }
 
 func createApollo() *Apollo {
@@ -37,7 +41,6 @@ func createApollo() *Apollo {
         events: make(chan termbox.Event, 20),
         configuration: createConfiguration(),
         database: createDatabase(),
-        currentTab: 0,
         tabs: tabs,
     }
 
@@ -60,8 +63,68 @@ func (a *Apollo) handleEvent(ev *termbox.Event) error {
 }
 
 func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
-    if ev.Key == termbox.KeyCtrlC {
-        a.running = false
+    handled := false
+    if !a.inputActive {
+        handled = a.tabs[a.currentTab].HandleKeyEvent(ev)
+    }
+
+    if !handled {
+        switch ev.Key {
+        case termbox.KeyEnter:
+            if a.inputActive {
+                a.inputActive = false
+            } else {
+                a.inputActive = true
+            }
+        case termbox.KeyCtrlC:
+            a.running = false
+        case termbox.KeyBackspace, termbox.KeyBackspace2:
+            if a.inputActive {
+                if a.inputCursor > 0 {
+                    a.input = append(a.input[:a.inputCursor-1], a.input[a.inputCursor:]...)
+                    a.inputCursor--
+                }
+            }
+        case termbox.KeySpace:
+            if a.inputActive {
+                a.input = append(a.input, ' ')
+                copy(a.input[a.inputCursor+1:], a.input[a.inputCursor:])
+                a.input[a.inputCursor] = ' '
+                a.inputCursor++
+            }
+        case termbox.KeyArrowLeft:
+            if a.inputActive {
+                a.inputCursor--
+                if a.inputCursor < 0 {
+                    a.inputCursor = 0
+                }
+            }
+        case termbox.KeyArrowRight:
+            if a.inputActive {
+                a.inputCursor++
+                if a.inputCursor > len(a.input) {
+                    a.inputCursor = len(a.input)
+                }
+            }
+        default:
+            if ev.Mod == termbox.ModAlt {
+                numbers := map[rune]int{'1': 1, '2': 2, '3': 3,
+                                        '4': 4, '5': 5, '6': 6,
+                                        '7': 7, '8': 8, '9': 9,}
+                if number, exist := numbers[ev.Ch]; exist {
+                    if len(a.tabs) > number - 1 {
+                        a.currentTab = number - 1
+                    }
+                }
+            } else {
+                if unicode.IsPrint(ev.Ch) && a.inputActive {
+                    a.input = append(a.input, ' ')
+                    copy(a.input[a.inputCursor+1:], a.input[a.inputCursor:])
+                    a.input[a.inputCursor] = ev.Ch
+                    a.inputCursor++
+                }
+            }
+        }
     }
 }
 
@@ -89,6 +152,22 @@ func (a *Apollo) draw() {
             termbox.SetCell(x, a.height - 2, runes[j], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
             x++
         }
+    }
+
+    if len(a.input) < a.width {
+        for i := 0; i < len(a.input); i++ {
+            termbox.SetCell(i, a.height - 1, a.input[i], termbox.ColorWhite, termbox.ColorDefault)
+        }
+    } else {
+        offset := len(a.input) - a.width + 1
+        for i := 0; i < a.width - 1; i++ {
+            termbox.SetCell(i, a.height - 1, a.input[i + offset], termbox.ColorWhite, termbox.ColorDefault)
+        }
+    }
+    if a.inputActive {
+        termbox.SetCursor(a.inputCursor, a.height - 1)
+    } else {
+        termbox.HideCursor()
     }
 
     termbox.Flush()
@@ -123,5 +202,6 @@ func main() {
     termbox.SetInputMode(termbox.InputAlt)
 
     apollo := createApollo()
+    apollo.draw()
     apollo.loop()
 }
