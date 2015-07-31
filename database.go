@@ -8,6 +8,7 @@ import (
 
 type Movie struct {
     Title string
+    State string
 }
 
 type Database struct {

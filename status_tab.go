@@ -7,6 +7,7 @@ import (
 type StatusTab struct {
     a *Apollo
     name string
+    status string
 
     history []string
 }
@@ -15,6 +16,7 @@ func createStatusTab(a *Apollo) *StatusTab {
     t := &StatusTab{
         a: a,
         name: "status",
+        status: "logs",
         history: make([]string, 200),
     }
 
@@ -26,7 +28,7 @@ func (t *StatusTab) Name() string {
 }
 
 func (t *StatusTab) Status() string {
-    return "wat"
+    return t.status
 }
 
 func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {

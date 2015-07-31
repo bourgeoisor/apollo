@@ -219,9 +219,9 @@ func (a *Apollo) openTab(name string) {
     }
 
     switch name {
-    //case movies:
-    //    a.tabs = append(a.tabs, Tab(NewMoviesTab()))
-    //    a.currentTab = len(a.tabs) - 1
+    case "movies":
+        a.tabs = append(a.tabs, Tab(CreateMoviesTab(a)))
+        a.currentTab = len(a.tabs) - 1
     default:
         a.logError("Tab doesn't exist.")
     }
