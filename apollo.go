@@ -7,6 +7,8 @@ import (
     "log"
 )
 
+const version = "Apollo v.0.1.1"
+
 type Tab interface {
     Name() string
     Status() string
@@ -45,6 +47,9 @@ func createApollo() *Apollo {
     }
 
     a.tabs = append(tabs, Tab(createStatusTab(a)))
+    a.tabs[0].Query("*** " + version + " ***")
+    a.tabs[0].Query("This software is under heavy developpment and may contain bugs and glitches.")
+    a.tabs[0].Query("Use at your own risk. To get started, use /help.")
 
     return a
 }
@@ -141,7 +146,7 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 func (a *Apollo) draw() {
     termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
-    runes := []rune("top status bar - " + a.tabs[a.currentTab].Status())
+    runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
     for i := 0; i < a.width; i++ {
         if i < len(runes) {
             termbox.SetCell(i, 0, runes[i], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
