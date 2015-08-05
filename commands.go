@@ -12,7 +12,11 @@ func (a *Apollo) handleCommand() {
     case "/quit":
         a.running = false
     case "/help":
-        a.log("Help is not made yet okay!")
+        if len(args) == 1 {
+            a.printHelp()
+        } else {
+            a.printDetailedHelp(args[1])
+        }
     case "/open":
         if len(args) == 2 {
             tab := args[1]

@@ -56,9 +56,7 @@ func createApollo() *Apollo {
     }
 
     a.tabs = append(tabs, Tab(createStatusTab(a)))
-    a.tabs[0].Query("{b}*** " + version + " ***")
-    a.tabs[0].Query("This software is under heavy developpment and may contain bugs and glitches.")
-    a.tabs[0].Query("Use at your own risk. To get started, use /help.")
+    a.printWelcome()
 
     return a
 }

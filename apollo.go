@@ -5,9 +5,6 @@ import (
     "log"
 )
 
-const version = "Apollo v.0.1.3"
-
-
 func (a *Apollo) loop() {
     go func() {
         for {
