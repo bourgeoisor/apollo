@@ -28,6 +28,18 @@ type Apollo struct {
     inputActive bool
 }
 
+var color map[rune]termbox.Attribute = map[rune]termbox.Attribute{
+    'd': termbox.ColorDefault,
+    'k': termbox.ColorBlack, 'K': termbox.ColorBlack | termbox.AttrBold,
+    'r': termbox.ColorRed, 'R': termbox.ColorRed | termbox.AttrBold,
+    'g': termbox.ColorGreen, 'G': termbox.ColorGreen | termbox.AttrBold,
+    'y': termbox.ColorYellow, 'Y': termbox.ColorYellow | termbox.AttrBold,
+    'b': termbox.ColorBlue, 'B': termbox.ColorBlue | termbox.AttrBold,
+    'm': termbox.ColorMagenta, 'M': termbox.ColorMagenta | termbox.AttrBold,
+    'c': termbox.ColorCyan, 'C': termbox.ColorCyan | termbox.AttrBold,
+    'w': termbox.ColorWhite, 'W': termbox.ColorWhite | termbox.AttrBold,
+}
+
 func createApollo() *Apollo {
     width, height := termbox.Size()
 
@@ -44,7 +56,7 @@ func createApollo() *Apollo {
     }
 
     a.tabs = append(tabs, Tab(createStatusTab(a)))
-    a.tabs[0].Query("*** " + version + " ***")
+    a.tabs[0].Query("{b}*** " + version + " ***")
     a.tabs[0].Query("This software is under heavy developpment and may contain bugs and glitches.")
     a.tabs[0].Query("Use at your own risk. To get started, use /help.")
 
@@ -146,34 +158,34 @@ func (a *Apollo) draw() {
     runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
     for i := 0; i < a.width; i++ {
         if i < len(runes) {
-            termbox.SetCell(i, 0, runes[i], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
+            termbox.SetCell(i, 0, runes[i], color['W'], color['K'])
         } else {
-            termbox.SetCell(i, 0, ' ', termbox.ColorDefault, termbox.ColorBlack | termbox.AttrBold)
+            termbox.SetCell(i, 0, ' ', color['d'], color['K'])
         }
     }
 
     a.tabs[a.currentTab].Draw()
 
     for i := 0; i < a.width; i++ {
-        termbox.SetCell(i, a.height - 2, ' ', termbox.ColorDefault, termbox.ColorBlack | termbox.AttrBold)
+        termbox.SetCell(i, a.height - 2, ' ', color['d'], color['K'])
     }
     x := 0
     for i := 0; i < len(a.tabs); i++ {
         runes := []rune(strconv.Itoa(i+1) + "." + a.tabs[i].Name() + " ")
         for j := 0; j < len(runes); j++ {
-            termbox.SetCell(x, a.height - 2, runes[j], termbox.ColorWhite | termbox.AttrBold, termbox.ColorBlack | termbox.AttrBold)
+            termbox.SetCell(x, a.height - 2, runes[j], color['W'], color['K'])
             x++
         }
     }
 
     if len(a.input) < a.width {
         for i := 0; i < len(a.input); i++ {
-            termbox.SetCell(i, a.height - 1, a.input[i], termbox.ColorWhite, termbox.ColorDefault)
+            termbox.SetCell(i, a.height - 1, a.input[i], color['w'], color['d'])
         }
     } else {
         offset := len(a.input) - a.width + 1
         for i := 0; i < a.width - 1; i++ {
-            termbox.SetCell(i, a.height - 1, a.input[i + offset], termbox.ColorWhite, termbox.ColorDefault)
+            termbox.SetCell(i, a.height - 1, a.input[i + offset], color['w'], color['d'])
         }
     }
     if a.inputActive {
@@ -190,7 +202,7 @@ func (a *Apollo) log(str string) {
 }
 
 func (a *Apollo) logError(str string) {
-    a.log("ERROR: " + str)
+    a.log("{r}ERROR: {d}" + str)
 }
 
 func (a *Apollo) openTab(name string) {
