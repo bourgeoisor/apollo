@@ -5,7 +5,7 @@ import (
     "log"
 )
 
-const version = "Apollo v.0.1.1"
+const version = "Apollo v.0.1.2"
 
 
 func (a *Apollo) loop() {

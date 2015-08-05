@@ -10,6 +10,7 @@ type StatusTab struct {
     status string
 
     history []string
+    offset int
 }
 
 func createStatusTab(a *Apollo) *StatusTab {
@@ -33,6 +34,16 @@ func (t *StatusTab) Status() string {
 
 func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {
     switch ev.Key {
+    case termbox.KeyPgup:
+        t.offset += 5
+        if t.offset > 200 - t.a.height + 3 {
+            t.offset = 200 - t.a.height + 3
+        }
+    case termbox.KeyPgdn:
+        t.offset -= 5
+        if t.offset < 0 {
+            t.offset = 0
+        }
     default:
         return false
     }
@@ -41,7 +52,7 @@ func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {
 }
 
 func (t *StatusTab) Draw() {
-    historySlice := t.history[200-t.a.height+3:200]
+    historySlice := t.history[200-t.a.height+3-t.offset:200-t.offset]
 
     for j := 1; j < t.a.height - 3; j++ {
         runes := []rune(historySlice[j])
