@@ -15,11 +15,11 @@ func (a *Apollo) loop() {
         select {
         case ev := <-a.events:
             err := a.handleEvent(&ev)
+            a.draw()
             if err != nil {
                 a.running = false
                 log.Fatal(err)
             }
-            a.draw()
         }
     }
 }

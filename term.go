@@ -153,6 +153,8 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 func (a *Apollo) draw() {
     termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
+    a.tabs[a.currentTab].Draw()
+
     runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
     for i := 0; i < a.width; i++ {
         if i < len(runes) {
@@ -161,8 +163,6 @@ func (a *Apollo) draw() {
             termbox.SetCell(i, 0, ' ', color['d'], color['K'])
         }
     }
-
-    a.tabs[a.currentTab].Draw()
 
     for i := 0; i < a.width; i++ {
         termbox.SetCell(i, a.height - 2, ' ', color['d'], color['K'])
