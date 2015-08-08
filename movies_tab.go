@@ -4,6 +4,7 @@ import (
     "github.com/nsf/termbox-go"
     "strconv"
     "log"
+    "sort"
 )
 
 type MoviesTab struct {
@@ -13,6 +14,7 @@ type MoviesTab struct {
 
     movies []Movie
     view string
+    sorter string
     offset int
     cursor int
 }
@@ -23,6 +25,7 @@ func CreateMoviesTab(a *Apollo) *MoviesTab {
         name: "movies",
         status: "movies",
         view: "watched",
+        sorter: "title",
     }
 
     t.refreshSlice()
@@ -49,8 +52,13 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
     case '3':
         t.view = "all"
         t.refreshSlice()
-    case '4':
-        t.view = "rank"
+    case 's':
+        t.sort()
+    case 'D':
+        if len(t.movies) > 0 {
+            t.a.d.Movies = append(t.a.d.Movies[:t.index()], t.a.d.Movies[t.index()+1:]...)
+            t.refreshSlice()
+        }
     }
 
     switch ev.Key {
@@ -96,7 +104,7 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         return false
     }
 
-    log.Print(strconv.Itoa(t.cursor) + " - " + strconv.Itoa(t.offset))
+    log.Print("cursor: " + strconv.Itoa(t.cursor))
 
     return true
 }
@@ -120,6 +128,16 @@ func (t *MoviesTab) Query(query string) {
     t.refreshSlice()
 }
 
+func (t *MoviesTab) index() int {
+    for i := 0; i < len(t.a.d.Movies); i++ {
+        if t.a.d.Movies[i].Title == t.movies[t.cursor].Title {
+            return i
+        }
+    }
+
+    return -1
+}
+
 func (t *MoviesTab) refreshSlice() {
     t.cursor = 0
     t.offset = 0
@@ -135,6 +153,25 @@ func (t *MoviesTab) refreshSlice() {
             }
         }
     }
+    t.sort()
 
     t.status = "movies - " + t.view + " (" + strconv.Itoa(len(t.movies)) + " entries)"
+}
+
+func (t *MoviesTab) sort() {
+    var titles []string
+    for i := 0; i < len(t.movies); i++ {
+        titles = append(titles, t.movies[i].Title)
+    }
+    sort.Strings(titles)
+
+    var movies []Movie
+    for j := 0; j < len(titles); j++ {
+        for i := 0; i < len(t.movies); i++ {
+            if titles[j] == t.movies[i].Title {
+                movies = append(movies, t.movies[i])
+            }
+        }
+    }
+    t.movies = movies
 }
