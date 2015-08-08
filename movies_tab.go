@@ -3,6 +3,7 @@ package main
 import (
     "github.com/nsf/termbox-go"
     "strconv"
+    "log"
 )
 
 type MoviesTab struct {
@@ -57,41 +58,51 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         t.cursor--
         if t.cursor < 0 {
             t.cursor = 0
-        } else if t.cursor + t.offset < 0 {
-            t.offset++
+        } else if t.cursor - t.offset < 0 {
+            t.offset--
         }
     case termbox.KeyPgup:
         t.cursor -= 5
         if t.cursor < 0 {
             t.cursor = 0
             t.offset = 0
-        } else if t.cursor + t.offset < 0 {
-            t.offset += 5
+        } else if t.cursor - t.offset < 0 {
+            t.offset -= 5
+            if t.offset < 0 {
+                t.offset = 0
+            }
         }
     case termbox.KeyArrowDown:
         t.cursor++
         if t.cursor > len(t.movies) - 1 {
             t.cursor--
-        } else if t.cursor + t.offset > t.a.height - 4 {
-            t.offset--
+        } else if t.cursor - t.offset > t.a.height - 4 {
+            t.offset++
         }
     case termbox.KeyPgdn:
         t.cursor += 5
         if t.cursor > len(t.movies) - 1 {
             t.cursor = len(t.movies) - 1
-            t.offset = -len(t.movies) + t.a.height - 4
-        } else if t.cursor + t.offset > t.a.height - 4 {
-            t.offset -= 5
+            if len(t.movies) > t.a.height - 3 {
+                t.offset = len(t.movies) - (t.a.height - 3)
+            }
+        } else if t.cursor - t.offset > t.a.height - 4 {
+            t.offset += 5
+            if t.cursor - t.offset < t.a.height - 3 {
+                t.offset = t.cursor - (t.a.height - 4)
+            }
         }
     default:
         return false
     }
 
+    log.Print(strconv.Itoa(t.cursor) + " - " + strconv.Itoa(t.offset))
+
     return true
 }
 
 func (t *MoviesTab) Draw() {
-    for j := 0; j < t.a.height - 2; j++ {
+    for j := 0; j < t.a.height - 3; j++ {
         if j < len(t.movies) {
             runes := []rune(t.movies[j + t.offset].Title)
             for i := 0; i < len(runes); i++ {
@@ -100,12 +111,13 @@ func (t *MoviesTab) Draw() {
         }
     }
 
-    termbox.SetCell(1, t.cursor + t.offset + 1, '*', color['d'], color['d'])
+    termbox.SetCell(1, t.cursor - t.offset + 1, '*', color['d'], color['d'])
 }
 
 func (t *MoviesTab) Query(query string) {
     t.a.d.Movies = append(t.a.d.Movies, Movie{Title: query, State: "Watched"})
     t.a.d.save()
+    t.refreshSlice()
 }
 
 func (t *MoviesTab) refreshSlice() {
