@@ -9,6 +9,8 @@ import (
 type Movie struct {
     Title string
     State string
+    Year string
+    ImdbID string
 }
 
 type Database struct {

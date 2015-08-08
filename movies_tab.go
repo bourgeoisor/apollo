@@ -2,10 +2,24 @@ package main
 
 import (
     "github.com/nsf/termbox-go"
+    "encoding/json"
+    "net/http"
+    "io/ioutil"
     "strconv"
+    "strings"
     "log"
     "sort"
 )
+
+type Entries struct {
+    Title string
+    Year string
+    imdbID string
+}
+
+type Data struct {
+    Search []Entries
+}
 
 type MoviesTab struct {
     a *Apollo
@@ -17,6 +31,7 @@ type MoviesTab struct {
     sorter string
     offset int
     cursor int
+    omdb Data
 }
 
 func CreateMoviesTab(a *Apollo) *MoviesTab {
@@ -42,6 +57,24 @@ func (t *MoviesTab) Status() string {
 }
 
 func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
+    if len(t.omdb.Search) > 0 {
+        indexes := map[rune]int{'0': 0, '1': 1, '2': 2, '3': 3,
+                                '4': 4, '5': 5, '6': 6, '7': 7,
+                                '8': 8, '9': 9,}
+        if index, exist := indexes[ev.Ch]; exist {
+            if index < len(t.omdb.Search) {
+                t.a.d.Movies[t.index()].Year = t.omdb.Search[index].Year
+                t.a.d.Movies[t.index()].Title = t.omdb.Search[index].Title
+            }
+        }
+
+        t.omdb.Search = t.omdb.Search[:0]
+        t.a.d.save()
+        t.refreshSlice()
+
+        return true
+    }
+
     switch ev.Ch {
     case '1':
         t.view = "watched"
@@ -59,6 +92,8 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
             t.a.d.Movies = append(t.a.d.Movies[:t.index()], t.a.d.Movies[t.index()+1:]...)
             t.refreshSlice()
         }
+    case 't':
+        t.autoTag()
     }
 
     switch ev.Key {
@@ -110,16 +145,25 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
 }
 
 func (t *MoviesTab) Draw() {
-    for j := 0; j < t.a.height - 3; j++ {
-        if j < len(t.movies) {
-            runes := []rune(t.movies[j + t.offset].Title)
+    if len(t.omdb.Search) == 0 {
+        for j := 0; j < t.a.height - 3; j++ {
+            if j < len(t.movies) {
+                runes := []rune("[" + t.movies[j + t.offset].Year + "] " + t.movies[j + t.offset].Title)
+                for i := 0; i < len(runes); i++ {
+                    termbox.SetCell(i + 3, j + 1, runes[i], color['d'], color['d'])
+                }
+            }
+        }
+
+        termbox.SetCell(1, t.cursor - t.offset + 1, '*', color['d'], color['d'])
+    } else {
+        for j := 0; j < len(t.omdb.Search); j++ {
+            runes := []rune(strconv.Itoa(j) + ". [" + t.omdb.Search[j].Year + "] " + t.omdb.Search[j].Title)
             for i := 0; i < len(runes); i++ {
-                termbox.SetCell(i + 3, j + 1, runes[i], color['d'], color['d'])
+                termbox.SetCell(i, j + 1, runes[i], color['d'], color['d'])
             }
         }
     }
-
-    termbox.SetCell(1, t.cursor - t.offset + 1, '*', color['d'], color['d'])
 }
 
 func (t *MoviesTab) Query(query string) {
@@ -174,4 +218,29 @@ func (t *MoviesTab) sort() {
         }
     }
     t.movies = movies
+}
+
+func (t *MoviesTab) autoTag() {
+    title := strings.Replace(t.movies[t.cursor].Title, " ", "+", -1)
+    url := "http://www.omdbapi.com/?s=" + title + "&type=movie&y=&plot=full&r=json"
+    log.Print(url)
+
+    res, err := http.Get(url)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer res.Body.Close()
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    err = json.Unmarshal(body, &t.omdb)
+    if err != nil {
+        log.Fatal(err)
+    } else {
+        for i := 0; i < len(t.omdb.Search); i++ {
+            log.Print(t.omdb.Search[i].Title + " - " + t.omdb.Search[i].Year)
+        }
+    }
 }
