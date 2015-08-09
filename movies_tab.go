@@ -170,6 +170,17 @@ func (t *MoviesTab) Query(query string) {
     t.a.d.Movies = append(t.a.d.Movies, Movie{Title: query, State: "Watched"})
     t.a.d.save()
     t.refreshSlice()
+
+    for i := 0; i < len(t.movies); i++ {
+        if t.movies[i].Title == query {
+            t.cursor = i
+            if t.cursor > t.a.height - 4 {
+                t.offset = t.cursor - (t.a.height - 4)
+            }
+            t.a.inputActive = false
+            t.autoTag()
+        }
+    }
 }
 
 func (t *MoviesTab) index() int {
