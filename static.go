@@ -1,6 +1,6 @@
 package main
 
-const version = "Apollo v.0.2.5"
+const version = "Apollo v.0.2.6"
 
 func (a *Apollo) printHelp() {
     s := []string {
@@ -18,6 +18,8 @@ func (a *Apollo) printHelp() {
         "/quit..........Close this software",
         "/open..........Create a new tab",
         "/close.........Close the current tab",
+        "/set...........Set a configuration option",
+        "/config........Show the current configuration",
         "***",
     }
 
@@ -70,6 +72,26 @@ func (a *Apollo) printDetailedHelp(subject string) {
             "",
             "e.g.",
             "/close",
+        }
+    case "set":
+        s = []string{
+            "***",
+            "/set <option> <value>",
+            "",
+            "Sets a configuration option to a specific value.",
+            "",
+            "e.g.",
+            "/set autotag false",
+        }
+    case "config":
+        s = []string{
+            "***",
+            "/config",
+            "",
+            "Shows the configuration options and their values.",
+            "",
+            "e.g.",
+            "/config",
         }
     default:
         s = []string{

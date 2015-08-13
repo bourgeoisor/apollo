@@ -32,6 +32,8 @@ func (a *Apollo) handleCommand() {
         } else {
             a.logError("Wrong number of arguments.")
         }
+    case "/config":
+        a.c.getAll()
     case "/close":
         a.closeCurrentTab()
     default:

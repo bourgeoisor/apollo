@@ -8,6 +8,7 @@ import (
 )
 
 type Configuration struct {
+    options map[string]string
 }
 
 func createConfiguration() *Configuration {
@@ -48,8 +49,20 @@ func (c *Configuration) save() {
 }
 
 func (c *Configuration) set(option string, value string) {
+    if _, ok := c.options[option]; ok {
+        c.options[option] = value
+    }
 }
 
 func (c *Configuration) get(option string) string {
+    if val, ok := c.options[option]; ok {
+        return val
+    }
     return ""
+}
+
+func (c *Configuration) getAll() []string {
+    var s []string
+
+    return s
 }
