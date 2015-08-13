@@ -2,19 +2,16 @@ package main
 
 import (
     "log"
+    "os"
     "io/ioutil"
     "encoding/json"
 )
 
 type Configuration struct {
-    Test string
-    Testb bool
 }
 
 func createConfiguration() *Configuration {
     c := &Configuration{
-        Test: "nope.avi",
-        Testb: true,
     }
 
     c.load()
@@ -24,9 +21,11 @@ func createConfiguration() *Configuration {
 }
 
 func (c *Configuration) load() {
-    cont, err := ioutil.ReadFile("configuration.json")
+    path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
+    cont, err := ioutil.ReadFile(path)
     if err != nil {
-        log.Fatal(err)
+        log.Print(err)
+        return
     }
 
     err = json.Unmarshal(cont, c)
@@ -41,12 +40,16 @@ func (c *Configuration) save() {
         log.Fatal(err)
     }
 
-    err = ioutil.WriteFile("configuration.json", cont, 0644)
+    path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
+    err = ioutil.WriteFile(path, cont, 0644)
     if err != nil {
-        log.Fatal(err)
+        log.Print(err)
     }
 }
 
 func (c *Configuration) set(option string, value string) {
-    
+}
+
+func (c *Configuration) get(option string) string {
+    return ""
 }

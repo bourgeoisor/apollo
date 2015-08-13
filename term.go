@@ -2,6 +2,8 @@ package main
 
 import (
     "github.com/nsf/termbox-go"
+    "os"
+    "log"
     "strconv"
     "unicode"
 )
@@ -41,8 +43,12 @@ var color map[rune]termbox.Attribute = map[rune]termbox.Attribute{
 }
 
 func createApollo() *Apollo {
-    width, height := termbox.Size()
+    err := os.Mkdir(os.Getenv("HOME") + "/.config/apollo", 0755)
+    if err != nil {
+        log.Print(err)
+    }
 
+    width, height := termbox.Size()
     var tabs []Tab
 
     a := &Apollo{

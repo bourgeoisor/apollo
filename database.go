@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "os"
     "io/ioutil"
     "encoding/json"
 )
@@ -27,9 +28,11 @@ func createDatabase() *Database {
 }
 
 func (d *Database) load() {
-    cont, err := ioutil.ReadFile("database.json")
+    path := os.Getenv("HOME") + "/.config/apollo/database.json"
+    cont, err := ioutil.ReadFile(path)
     if err != nil {
-        log.Fatal(err)
+        log.Print(err)
+        return
     }
 
     err = json.Unmarshal(cont, d)
@@ -44,8 +47,9 @@ func (d *Database) save() {
         log.Fatal(err)
     }
 
-    err = ioutil.WriteFile("database.json", cont, 0644)
+    path := os.Getenv("HOME") + "/.config/apollo/database.json"
+    err = ioutil.WriteFile(path, cont, 0644)
     if err != nil {
-        log.Fatal(err)
+        log.Print(err)
     }
 }
