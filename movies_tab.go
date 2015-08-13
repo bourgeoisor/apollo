@@ -14,7 +14,7 @@ import (
 type Entries struct {
     Title string
     Year string
-    imdbID string
+    ImdbID string
 }
 
 type Data struct {
@@ -63,8 +63,10 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
                                 '8': 8, '9': 9,}
         if index, exist := indexes[ev.Ch]; exist {
             if index < len(t.omdb.Search) {
+                log.Print(t.omdb.Search[index])
                 t.a.d.Movies[t.index()].Year = t.omdb.Search[index].Year
                 t.a.d.Movies[t.index()].Title = t.omdb.Search[index].Title
+                t.a.d.Movies[t.index()].ImdbID = t.omdb.Search[index].ImdbID
             }
         }
 
@@ -253,5 +255,6 @@ func (t *MoviesTab) autoTag() {
         for i := 0; i < len(t.omdb.Search); i++ {
             log.Print(t.omdb.Search[i].Title + " - " + t.omdb.Search[i].Year)
         }
+        log.Print(t.omdb)
     }
 }
