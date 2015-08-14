@@ -32,6 +32,7 @@ type MoviesTab struct {
     offset int
     cursor int
     omdb Data
+    ratings bool
 }
 
 func CreateMoviesTab(a *Apollo) *MoviesTab {
@@ -106,6 +107,28 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         }
     case 't':
         t.autoTag()
+    case 'r':
+        if t.ratings {
+            t.ratings = false
+        } else {
+            t.ratings = true
+        }
+    case 'q':
+        if len(t.movies) > 0 {
+            if t.a.d.Movies[t.index()].Rating > 0 {
+                t.a.d.Movies[t.index()].Rating--
+                t.a.d.save()
+                t.refreshSlice()
+            }
+        }
+    case 'e':
+        if len(t.movies) > 0 {
+            if t.a.d.Movies[t.index()].Rating < 6 {
+                t.a.d.Movies[t.index()].Rating++
+                t.a.d.save()
+                t.refreshSlice()
+            }
+        }
     }
 
     switch ev.Key {
@@ -161,9 +184,19 @@ func (t *MoviesTab) Draw() {
     if len(t.omdb.Search) == 0 {
         for j := 0; j < t.a.height - 3; j++ {
             if j < len(t.movies) {
+                if t.ratings {
+                    for i := 0; i < t.movies[j + t.offset].Rating; i++ {
+                        termbox.SetCell(i + 3, j + 1, '*', color['d'], color['d'])
+                    }
+                }
+
                 runes := []rune("[" + t.movies[j + t.offset].Year + "] " + t.movies[j + t.offset].Title)
                 for i := 0; i < len(runes); i++ {
-                    termbox.SetCell(i + 3, j + 1, runes[i], color['d'], color['d'])
+                    if t.ratings {
+                        termbox.SetCell(i + 10, j + 1, runes[i], color['d'], color['d'])
+                    } else {
+                        termbox.SetCell(i + 3, j + 1, runes[i], color['d'], color['d'])
+                    }
                 }
             }
         }

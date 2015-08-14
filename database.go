@@ -12,6 +12,7 @@ type Movie struct {
     State string
     Year string
     ImdbID string
+    Rating int
 }
 
 type Database struct {
