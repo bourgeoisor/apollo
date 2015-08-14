@@ -64,9 +64,10 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         if index, exist := indexes[ev.Ch]; exist {
             if index < len(t.omdb.Search) {
                 log.Print(t.omdb.Search[index])
-                t.a.d.Movies[t.index()].Year = t.omdb.Search[index].Year
-                t.a.d.Movies[t.index()].Title = t.omdb.Search[index].Title
-                t.a.d.Movies[t.index()].ImdbID = t.omdb.Search[index].ImdbID
+                dbIndex := t.index()
+                t.a.d.Movies[dbIndex].Year = t.omdb.Search[index].Year
+                t.a.d.Movies[dbIndex].Title = t.omdb.Search[index].Title
+                t.a.d.Movies[dbIndex].ImdbID = t.omdb.Search[index].ImdbID
             }
         }
 
@@ -80,18 +81,27 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
     switch ev.Ch {
     case '1':
         t.view = "watched"
+        t.cursor = 0
+        t.offset = 0
         t.refreshSlice()
     case '2':
         t.view = "unwatched"
+        t.cursor = 0
+        t.offset = 0
         t.refreshSlice()
     case '3':
         t.view = "all"
+        t.cursor = 0
+        t.offset = 0
         t.refreshSlice()
     case 's':
+        t.cursor = 0
+        t.offset = 0
         t.sort()
     case 'D':
         if len(t.movies) > 0 {
             t.a.d.Movies = append(t.a.d.Movies[:t.index()], t.a.d.Movies[t.index()+1:]...)
+            t.a.d.save()
             t.refreshSlice()
         }
     case 't':
@@ -141,7 +151,8 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         return false
     }
 
-    log.Print("cursor: " + strconv.Itoa(t.cursor))
+    log.Print("cursor: " + strconv.Itoa(t.cursor) + " offset: " + strconv.Itoa(t.offset) + 
+    " len:" + strconv.Itoa(len(t.movies)) + " height:" + strconv.Itoa(t.a.height))
 
     return true
 }
@@ -196,8 +207,6 @@ func (t *MoviesTab) index() int {
 }
 
 func (t *MoviesTab) refreshSlice() {
-    t.cursor = 0
-    t.offset = 0
     t.movies = t.movies[:0]
     for i := 0; i < len(t.a.d.Movies); i++ {
         if t.a.d.Movies[i].State == "Watched" {
@@ -211,6 +220,16 @@ func (t *MoviesTab) refreshSlice() {
         }
     }
     t.sort()
+
+    if t.cursor > len(t.movies) - 1 {
+        t.cursor--
+    }
+
+    if t.offset > 0 {
+        if len(t.movies) - t.offset < t.a.height - 3 {
+            t.offset--
+        }
+    }
 
     t.status = "movies - " + t.view + " (" + strconv.Itoa(len(t.movies)) + " entries)"
 }
