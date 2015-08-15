@@ -113,6 +113,15 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         } else {
             t.ratings = true
         }
+    case 'a':
+        if t.a.d.Movies[t.index()].State == "Watched" {
+            t.a.d.Movies[t.index()].State = "Unwatched"
+        } else {
+            t.a.d.Movies[t.index()].State = "Watched"
+        }
+        t.a.d.Movies[t.index()].Rating = 0
+        t.a.d.save()
+        t.refreshSlice()
     case 'q':
         if len(t.movies) > 0 {
             if t.a.d.Movies[t.index()].Rating > 0 {
@@ -189,7 +198,7 @@ func (t *MoviesTab) Draw() {
                         if t.movies[j + t.offset].State == "Watched" {
                             termbox.SetCell(i + 3, j + 1, '*', color['y'], color['d'])
                         } else {
-                            termbox.SetCell(i + 3, j + 1, '*', color['b'], color['d'])
+                            termbox.SetCell(i + 3, j + 1, '*', color['B'], color['d'])
                         }
                     }
                 }
@@ -198,7 +207,11 @@ func (t *MoviesTab) Draw() {
                 for i := 0; i < len(runes); i++ {
                     fg := color['d']
                     if i < 4 {
-                        fg = color['c']
+                        if t.movies[j + t.offset].State == "Watched" {
+                            fg = color['g']
+                        } else {
+                            fg = color['b']
+                        }
                     }
 
                     if t.ratings {
