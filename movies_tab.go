@@ -186,16 +186,25 @@ func (t *MoviesTab) Draw() {
             if j < len(t.movies) {
                 if t.ratings {
                     for i := 0; i < t.movies[j + t.offset].Rating; i++ {
-                        termbox.SetCell(i + 3, j + 1, '*', color['d'], color['d'])
+                        if t.movies[j + t.offset].State == "Watched" {
+                            termbox.SetCell(i + 3, j + 1, '*', color['y'], color['d'])
+                        } else {
+                            termbox.SetCell(i + 3, j + 1, '*', color['b'], color['d'])
+                        }
                     }
                 }
 
-                runes := []rune("[" + t.movies[j + t.offset].Year + "] " + t.movies[j + t.offset].Title)
+                runes := []rune(t.movies[j + t.offset].Year + " " + t.movies[j + t.offset].Title)
                 for i := 0; i < len(runes); i++ {
+                    fg := color['d']
+                    if i < 4 {
+                        fg = color['c']
+                    }
+
                     if t.ratings {
-                        termbox.SetCell(i + 10, j + 1, runes[i], color['d'], color['d'])
+                        termbox.SetCell(i + 10, j + 1, runes[i], fg, color['d'])
                     } else {
-                        termbox.SetCell(i + 3, j + 1, runes[i], color['d'], color['d'])
+                        termbox.SetCell(i + 3, j + 1, runes[i], fg, color['d'])
                     }
                 }
             }
