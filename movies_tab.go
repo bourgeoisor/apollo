@@ -79,6 +79,18 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         return true
     }
 
+    if t.view == "edit" {
+        switch ev.Ch {
+        case '0':
+            t.a.inputActive = true
+            t.a.input = []rune(":t " + t.a.d.Movies[t.index()].Title)
+        case '1':
+            t.a.inputActive = true
+            t.a.input = []rune(":y " + t.a.d.Movies[t.index()].Year)
+        }
+        return true
+    }
+
     switch ev.Ch {
     case '1':
         t.view = "watched"
@@ -114,6 +126,13 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         }
     case 't':
         t.autoTag()
+    case 'e':
+        if t.view != "edit" {
+            t.view = "edit"
+        } else {
+            t.view = "watched"
+            t.refreshSlice()
+        }
     case 'r':
         if t.ratings {
             t.ratings = false
@@ -129,7 +148,7 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         t.a.d.Movies[t.index()].Rating = 0
         t.a.d.save()
         t.refreshSlice()
-    case 'q':
+    case 'z':
         if len(t.movies) > 0 {
             if t.a.d.Movies[t.index()].Rating > 0 {
                 t.a.d.Movies[t.index()].Rating--
@@ -137,7 +156,7 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
                 t.refreshSlice()
             }
         }
-    case 'e':
+    case 'x':
         if len(t.movies) > 0 {
             if t.a.d.Movies[t.index()].Rating < 6 {
                 t.a.d.Movies[t.index()].Rating++
@@ -197,63 +216,85 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
 }
 
 func (t *MoviesTab) Draw() {
-    if len(t.omdb.Search) == 0 {
-        for j := 0; j < t.a.height - 3; j++ {
-            if j < len(t.movies) {
-                if t.ratings {
-                    for i := 0; i < t.movies[j + t.offset].Rating; i++ {
-                        if t.movies[j + t.offset].State == "Watched" {
-                            termbox.SetCell(i + 3, j + 1, '*', color['y'], color['d'])
+    if t.view != "edit" {
+        if len(t.omdb.Search) == 0 {
+            for j := 0; j < t.a.height - 3; j++ {
+                if j < len(t.movies) {
+                    if t.ratings {
+                        for i := 0; i < t.movies[j + t.offset].Rating; i++ {
+                            if t.movies[j + t.offset].State == "Watched" {
+                                termbox.SetCell(i + 3, j + 1, '*', color['y'], color['d'])
+                            } else {
+                                termbox.SetCell(i + 3, j + 1, '*', color['B'], color['d'])
+                            }
+                        }
+                    }
+
+                    runes := []rune(t.movies[j + t.offset].Year + " " + t.movies[j + t.offset].Title)
+                    for i := 0; i < len(runes); i++ {
+                        fg := color['d']
+                        if i < 4 {
+                            if t.movies[j + t.offset].State == "Watched" {
+                                fg = color['g']
+                            } else {
+                                fg = color['b']
+                            }
+                        }
+
+                        if t.ratings {
+                            termbox.SetCell(i + 10, j + 1, runes[i], fg, color['d'])
                         } else {
-                            termbox.SetCell(i + 3, j + 1, '*', color['B'], color['d'])
+                            termbox.SetCell(i + 3, j + 1, runes[i], fg, color['d'])
                         }
                     }
                 }
+            }
 
-                runes := []rune(t.movies[j + t.offset].Year + " " + t.movies[j + t.offset].Title)
+            termbox.SetCell(1, t.cursor - t.offset + 1, '*', color['d'], color['d'])
+        } else {
+            for j := 0; j < len(t.omdb.Search); j++ {
+                runes := []rune(strconv.Itoa(j) + ". [" + t.omdb.Search[j].Year + "] " + t.omdb.Search[j].Title)
                 for i := 0; i < len(runes); i++ {
-                    fg := color['d']
-                    if i < 4 {
-                        if t.movies[j + t.offset].State == "Watched" {
-                            fg = color['g']
-                        } else {
-                            fg = color['b']
-                        }
-                    }
-
-                    if t.ratings {
-                        termbox.SetCell(i + 10, j + 1, runes[i], fg, color['d'])
-                    } else {
-                        termbox.SetCell(i + 3, j + 1, runes[i], fg, color['d'])
-                    }
+                    termbox.SetCell(i, j + 1, runes[i], color['d'], color['d'])
                 }
             }
         }
-
-        termbox.SetCell(1, t.cursor - t.offset + 1, '*', color['d'], color['d'])
     } else {
-        for j := 0; j < len(t.omdb.Search); j++ {
-            runes := []rune(strconv.Itoa(j) + ". [" + t.omdb.Search[j].Year + "] " + t.omdb.Search[j].Title)
-            for i := 0; i < len(runes); i++ {
-                termbox.SetCell(i, j + 1, runes[i], color['d'], color['d'])
-            }
+        runes := []rune("0. " + t.a.d.Movies[t.index()].Title)
+        for i := 0; i < len(runes); i++ {
+            termbox.SetCell(i, 1, runes[i], color['d'], color['d'])
+        }
+
+        runes = []rune("1. " + t.a.d.Movies[t.index()].Year)
+        for i := 0; i < len(runes); i++ {
+            termbox.SetCell(i, 2, runes[i], color['d'], color['d'])
         }
     }
 }
 
 func (t *MoviesTab) Query(query string) {
-    t.a.d.Movies = append(t.a.d.Movies, Movie{Title: query, State: "Watched"})
-    t.a.d.save()
-    t.refreshSlice()
+    if query[0] != ':' {
+        t.a.d.Movies = append(t.a.d.Movies, Movie{Title: query, State: "Watched"})
+        t.a.d.save()
+        t.refreshSlice()
 
-    for i := 0; i < len(t.movies); i++ {
-        if t.movies[i].Title == query {
-            t.cursor = i
-            if t.cursor > t.a.height - 4 {
-                t.offset = t.cursor - (t.a.height - 4)
+        for i := 0; i < len(t.movies); i++ {
+            if t.movies[i].Title == query {
+                t.cursor = i
+                if t.cursor > t.a.height - 4 {
+                    t.offset = t.cursor - (t.a.height - 4)
+                }
+                t.a.inputActive = false
+                t.autoTag()
             }
-            t.a.inputActive = false
-            t.autoTag()
+        }
+    } else {
+        if query[1] == 't' {
+            t.a.d.Movies[t.index()].Title = query[3:]
+        }
+
+        if query[1] == 'y' {
+            t.a.d.Movies[t.index()].Year = query[3:]
         }
     }
 }
