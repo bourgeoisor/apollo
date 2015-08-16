@@ -96,6 +96,13 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
         t.offset = 0
         t.refreshSlice()
     case 's':
+        if t.sorter == "title" {
+            t.sorter = "year"
+        } else if t.sorter == "year" {
+            t.sorter = "rating"
+        } else if t.sorter == "rating" {
+            t.sorter = "title"
+        }
         t.cursor = 0
         t.offset = 0
         t.sort()
@@ -300,6 +307,24 @@ func (t *MoviesTab) sort() {
     for j := 0; j < len(titles); j++ {
         for i := 0; i < len(t.movies); i++ {
             if titles[j] == t.movies[i].Title {
+                movies = append(movies, t.movies[i])
+            }
+        }
+    }
+    t.movies = movies
+
+    if t.sorter == "year" {
+
+    } else if t.sorter == "rating" {
+        t.sortByRating()
+    }
+}
+
+func (t *MoviesTab) sortByRating() {
+    var movies []Movie
+    for j := 0; j < 7; j++ {
+        for i := 0; i < len(t.movies); i++ {
+            if t.movies[i].Rating == 6 - j {
                 movies = append(movies, t.movies[i])
             }
         }
