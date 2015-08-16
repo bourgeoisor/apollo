@@ -11,8 +11,12 @@ type Configuration struct {
     options map[string]string
 }
 
-func createConfiguration() *Configuration {
+func newConfiguration() *Configuration {
+    options := map[string]string{
+    }
+
     c := &Configuration{
+        options: options,
     }
 
     c.load()
@@ -29,14 +33,14 @@ func (c *Configuration) load() {
         return
     }
 
-    err = json.Unmarshal(cont, c)
+    err = json.Unmarshal(cont, &c.options)
     if err != nil {
         log.Fatal(err)
     }
 }
 
 func (c *Configuration) save() {
-    cont, err := json.Marshal(c)
+    cont, err := json.Marshal(c.options)
     if err != nil {
         log.Fatal(err)
     }
@@ -49,20 +53,25 @@ func (c *Configuration) save() {
 }
 
 func (c *Configuration) set(option string, value string) {
-    if _, ok := c.options[option]; ok {
+    if _, exist := c.options[option]; exist {
         c.options[option] = value
     }
 }
 
 func (c *Configuration) get(option string) string {
-    if val, ok := c.options[option]; ok {
-        return val
+    if value, exist := c.options[option]; exist {
+        return value
     }
+
     return ""
 }
 
-func (c *Configuration) getAll() []string {
+func (c *Configuration) config() []string {
     var s []string
+
+    for key, value := range c.options {
+        s = append(s, key + ": " + value)
+    }
 
     return s
 }

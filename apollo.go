@@ -33,7 +33,7 @@ func main() {
 
     termbox.SetInputMode(termbox.InputAlt)
 
-    apollo := createApollo()
+    apollo := newApollo()
     apollo.draw()
     apollo.loop()
 }

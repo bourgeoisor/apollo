@@ -7,19 +7,19 @@ import (
     "encoding/json"
 )
 
-type Movie struct {
+type Entry struct {
     Title string
     State string
     Year string
-    ImdbID string
+    TagID string
     Rating int
 }
 
 type Database struct {
-    Movies []Movie
+    Movies []Entry
 }
 
-func createDatabase() *Database {
+func newDatabase() *Database {
     d := &Database{}
 
     d.load()
