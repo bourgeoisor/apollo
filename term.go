@@ -221,6 +221,12 @@ func (a *Apollo) logError(str string) {
     a.log("{r}ERROR: {d}" + str)
 }
 
+func (a *Apollo) logDebug(str string) {
+    if a.c.get("debug") == "true" {
+        log.Print(str)
+    }
+}
+
 func (a *Apollo) openTab(name string) error {
     for i := range a.tabs {
         if a.tabs[i].Name() == name {

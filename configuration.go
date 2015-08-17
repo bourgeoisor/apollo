@@ -3,6 +3,7 @@ package main
 import (
     "log"
     "os"
+    "errors"
     "io/ioutil"
     "encoding/json"
 )
@@ -15,6 +16,7 @@ func newConfiguration() *Configuration {
     options := map[string]string{
         "autotag": "false",
         "movies_tab": "false",
+        "debug": "false",
     }
 
     c := &Configuration{
@@ -61,12 +63,15 @@ func (c *Configuration) save() {
     }
 }
 
-func (c *Configuration) set(option string, value string) {
+func (c *Configuration) set(option string, value string) error {
     if _, exist := c.options[option]; exist {
         c.options[option] = value
+    } else {
+        return errors.New("config: invalid option")
     }
 
     c.save()
+    return nil
 }
 
 func (c *Configuration) get(option string) string {

@@ -2,7 +2,6 @@ package main
 
 import (
     "strings"
-    "log"
 )
 
 func (a *Apollo) handleCommand() {
@@ -22,27 +21,33 @@ func (a *Apollo) handleCommand() {
         if len(args) == 2 {
             err := a.openTab(args[1])
             if err != nil {
-                log.Print(err)
+                a.logError(err.Error())
             }
         } else {
-            a.logError("Wrong number of arguments.")
+            a.logError("term: invalid number of arguments")
         }
     case "/close":
         err := a.closeCurrentTab()
         if err != nil {
-            log.Print(err)
+            a.logError(err.Error())
         }
     case "/set":
         if len(args) == 3 {
-            a.c.set(args[1], args[2])
+            err := a.c.set(args[1], args[2]) 
+            if err != nil {
+                a.logError(err.Error())
+            } else {
+                a.log("Configuration changed.")
+            }
         } else {
-            a.logError("Wrong number of arguments.")
+            a.logError("term: invalid number of arguments")
         }
     case "/config":
+        a.log("Current configuration:")
         for _, value := range a.c.config() {
             a.log(value)
         }
     default:
-        a.logError("'" + command + "' is not a valid command.")
+        a.logError("term: invalid command")
     }
 }

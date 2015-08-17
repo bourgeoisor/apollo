@@ -3,7 +3,6 @@ package main
 import (
     "github.com/nsf/termbox-go"
     "strconv"
-    "log"
     "sort"
 )
 
@@ -51,7 +50,6 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                                 '8': 8, '9': 9,}
         if i, exist := indexes[ev.Ch]; exist {
             if i < len(t.search) {
-                log.Print(t.search[i])
                 t.slice[t.cursor].Title = t.search[i].Title
                 t.slice[t.cursor].Year = t.search[i].Year
                 t.slice[t.cursor].TagID = t.search[i].TagID
@@ -113,7 +111,7 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
         if len(t.slice) > 0 {
             for i := range *t.entries {
                 if (*t.entries)[i] == *t.slice[t.cursor] {
-                    log.Print(i)
+                    t.a.logDebug("deleted id." + strconv.Itoa(i))
                     *t.entries = append((*t.entries)[:i], (*t.entries)[i+1:]...)
                     break
                 }
@@ -207,7 +205,7 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
         return false
     }
 
-    log.Print("cursor: " + strconv.Itoa(t.cursor) + " offset: " + strconv.Itoa(t.offset) + 
+    t.a.logDebug("cursor: " + strconv.Itoa(t.cursor) + " offset: " + strconv.Itoa(t.offset) + 
     " len:" + strconv.Itoa(len(t.slice)) + " height:" + strconv.Itoa(t.a.height))
 
     return true

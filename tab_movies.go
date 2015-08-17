@@ -6,7 +6,6 @@ import (
     "net/http"
     "io/ioutil"
     "strings"
-    "log"
 )
 
 type OMDBEntry struct {
@@ -63,22 +62,25 @@ func (t *MoviesTab) Query(query string) {
 func (t *MoviesTab) fetchOMDBTags() {
     title := strings.Replace(t.slice[t.cursor].Title, " ", "+", -1)
     url := "http://www.omdbapi.com/?s=" + title + "&type=movie&y=&plot=full&r=json"
-    log.Print(url)
+    t.a.logDebug(url)
 
     res, err := http.Get(url)
     if err != nil {
-        log.Fatal(err)
+        t.a.logError(err.Error())
+        return
     }
     defer res.Body.Close()
     body, err := ioutil.ReadAll(res.Body)
     if err != nil {
-        log.Fatal(err)
+        t.a.logError(err.Error())
+        return
     }
 
     var data OMDBData
     err = json.Unmarshal(body, &data)
     if err != nil {
-        log.Fatal(err)
+        t.a.logError(err.Error())
+        return
     } else {
         for i := 0; i < len(data.Search); i++ {
             t.search = append(t.search, Entry{
@@ -87,7 +89,6 @@ func (t *MoviesTab) fetchOMDBTags() {
                 TagID: data.Search[i].ImdbID,
             })
         }
-        log.Print(t.search)
     }
 
     if len(t.search) > 0 {
