@@ -113,7 +113,7 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
         if len(a.input) > 0 {
             if a.input[0] == '/' {
                 a.handleCommand()
-            } else {
+            } else if a.currentTab != 0 {
                 a.tabs[a.currentTab].Query(string(a.input))
             }
             a.input = a.input[:0]
@@ -230,7 +230,7 @@ func (a *Apollo) log(str string) {
 }
 
 func (a *Apollo) logError(str string) {
-    a.log("{r}ERROR: {d}" + str)
+    a.log("{r}│ ERROR: {d}" + str)
 }
 
 func (a *Apollo) logDebug(str string) {
@@ -265,7 +265,7 @@ func (a *Apollo) openTab(name string) error {
 }
 
 func (a *Apollo) closeCurrentTab() error {
-    if a.tabs[a.currentTab].Name() == "status" {
+    if a.tabs[a.currentTab].Name() == "(status)" {
         return errors.New("term: cannot close status tab")
     }
 

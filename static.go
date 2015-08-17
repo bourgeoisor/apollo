@@ -4,23 +4,21 @@ const version = "Apollo v.0.3.1"
 
 func (a *Apollo) printHelp() {
     s := []string {
-        "***",
-        "Apollo Help Guide",
-        "",
-        "List of key-bindings:",
-        "Ctrl+C.........Close this software",
-        "Alt+Num........Go to the [num]th tab",
-        "Enter..........Send, or toggle between input bar and tab",
-        "",
-        "List of commands:",
-        "(For more details, use /help <command name>)",
-        "/help..........Show this help guide",
-        "/quit..........Close this software",
-        "/open..........Create a new tab",
-        "/close.........Close the current tab",
-        "/set...........Set a configuration option",
-        "/config........Show the current configuration",
-        "***",
+        "{b}*───( Main Help Guide )───*",
+        "{b}│ {d}List of key-bindings:",
+        "{b}│ {d}Ctrl+C.........Close this software",
+        "{b}│ {d}Alt+Num........Go to the [num]th tab",
+        "{b}│ {d}Enter..........Send, or toggle between input bar and tab",
+        "{b}│",
+        "{b}│ {d}List of commands:",
+        "{b}│ {d}(For more details, use /help <command name>)",
+        "{b}│ {d}/help..........Show this help guide",
+        "{b}│ {d}/quit..........Close this software",
+        "{b}│ {d}/open..........Create a new tab",
+        "{b}│ {d}/close.........Close the current tab",
+        "{b}│ {d}/set...........Set a configuration option",
+        "{b}│ {d}/config........Show the current configuration",
+        "{b}*───*",
     }
 
     for i := 0; i < len(s); i++ {
@@ -33,73 +31,77 @@ func (a *Apollo) printDetailedHelp(subject string) {
     switch subject {
     case "help":
         s = []string{
-            "***",
-            "/help",
-            "/help <command name>",
-            "",
-            "Honestly, if you're asking for help about the help command, you should seek for help.",
-            "",
-            "e.g.",
-            "/help",
-            "/help quit",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/help",
+            "{b}│ {d}/help <command name>",
+            "{b}│",
+            "{b}│ {d}Displays a help guide.",
+            "{b}*───*",
         }
     case "quit":
         s = []string{
-            "***",
-            "/quit",
-            "",
-            "Closes this software.",
-            "",
-            "e.g.",
-            "/quit",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/quit",
+            "{b}│",
+            "{b}│ {d}Closes this software.",
+            "{b}*───*",
         }
     case "open":
         s = []string{
-            "***",
-            "/open <tab name>",
-            "",
-            "Opens a given tab or, if it already exists, selects it.",
-            "",
-            "e.g.",
-            "/open movies",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/open <tab name>",
+            "{b}│",
+            "{b}│ {d}Opens a given tab or, if it already exists, selects it.",
+            "{b}│ {d}Tabs available: anime, series, games, and books.",
+            "{b}│ {d}For keybindings, use '/help tabs'",
+            "{b}*───*",
         }
     case "close":
         s = []string{
-            "***",
-            "/close",
-            "",
-            "Close the current tab.",
-            "",
-            "e.g.",
-            "/close",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/close",
+            "{b}│",
+            "{b}│ {d}Close the current tab.",
+            "{b}*───*",
         }
     case "set":
         s = []string{
-            "***",
-            "/set <option> <value>",
-            "",
-            "Sets a configuration option to a specific value.",
-            "",
-            "e.g.",
-            "/set autotag false",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/set <option> <value>",
+            "{b}│",
+            "{b}│ {d}Sets a configuration option to a specific value.",
+            "{b}*───*",
         }
     case "config":
         s = []string{
-            "***",
-            "/config",
-            "",
-            "Shows the configuration options and their values.",
-            "",
-            "e.g.",
-            "/config",
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}/config",
+            "{b}│",
+            "{b}│ {d}Shows the configuration options and their values.",
+            "{b}*───*",
+        }
+    case "tabs":
+        s = []string{
+            "{b}*───( Detailed Help Guide )───*",
+            "{b}│ {d}List of key-bindings:",
+            "{b}│ {d}1..............Switch to passive view",
+            "{b}│ {d}2..............Switch to active view",
+            "{b}│ {d}3..............Switch to inactive view",
+            "{b}│ {d}4..............Switch to all view",
+            "{b}│ {d}s..............Sort the entries",
+            "{b}│ {d}D..............Delete the current entry",
+            "{b}│ {d}e..............Edit the current entry",
+            "{b}│ {d}t..............Tag the current entry",
+            "{b}│ {d}r..............Toggle ratings",
+            "{b}│ {d}a..............Toggle the current entry's state",
+            "{b}│ {d}z/x............Change the rating of the current entry",
+            "{b}*───*",
         }
     default:
         s = []string{
-            "***",
-            "Detailed help does not exist for this command.",
+            "{b}│ {d}Detailed help does not exist for this command.",
         }
     }
-    s = append(s, "***")
 
     for i := 0; i < len(s); i++ {
         a.log(s[i])
@@ -107,7 +109,16 @@ func (a *Apollo) printDetailedHelp(subject string) {
 }
 
 func (a *Apollo) printWelcome() {
-    a.tabs[0].Query("{b}*** " + version + " ***")
-    a.tabs[0].Query("This software is under heavy developpment and may contain bugs and glitches.")
-    a.tabs[0].Query("Use at your own risk. To get started, use /help.")
+    a.log("{b}*───( " + version + " )───*")
+    a.log("{b}│ {d}This software is under heavy developpment and may contain bugs and glitches.")
+    a.log("{b}│ {d}Use at your own risk. To get started, use /help.")
+    a.log("{b}*───*")
+}
+
+func (a *Apollo) printConfig() {
+    a.log("{b}*───( Current Configuration )───*")
+    for _, value := range a.c.config() {
+        a.log("{b}│ {d}" + value)
+    }
+    a.log("{b}*───*")
 }

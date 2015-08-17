@@ -37,16 +37,13 @@ func (a *Apollo) handleCommand() {
             if err != nil {
                 a.logError(err.Error())
             } else {
-                a.log("Configuration changed.")
+                a.log("{b}│ {d}Configuration changed.")
             }
         } else {
             a.logError("term: invalid number of arguments")
         }
     case "/config":
-        a.log("Current configuration:")
-        for _, value := range a.c.config() {
-            a.log(value)
-        }
+        a.printConfig()
     default:
         a.logError("term: invalid command")
     }

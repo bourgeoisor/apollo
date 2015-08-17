@@ -16,7 +16,7 @@ type StatusTab struct {
 func newStatusTab(a *Apollo) *StatusTab {
     t := &StatusTab{
         a: a,
-        name: "status",
+        name: "(status)",
         status: "logs",
         history: make([]string, 200),
     }
