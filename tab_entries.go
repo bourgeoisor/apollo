@@ -28,6 +28,27 @@ func (t *MoviesTab) Status() string {
     return t.status
 }
 
+func (t *EntriesTab) changeView(view string) {
+    t.view = view
+    t.cursor = 0
+    t.offset = 0
+    t.refreshSlice()
+}
+
+func (t *EntriesTab) toggleSort() {
+    if t.sortField == "title" {
+        t.sortField = "year"
+    } else if t.sortField == "year" {
+        t.sortField = "rating"
+    } else if t.sortField == "rating" {
+        t.sortField = "title"
+    }
+
+    t.cursor = 0
+    t.offset = 0
+    t.sort()
+}
+
 func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
     if t.view == "edit" {
         switch ev.Ch {
@@ -77,36 +98,15 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
 
     switch ev.Ch {
     case '1':
-        t.view = "passive"
-        t.cursor = 0
-        t.offset = 0
-        t.refreshSlice()
+        t.changeView("passive")
     case '2':
-        t.view = "active"
-        t.cursor = 0
-        t.offset = 0
-        t.refreshSlice()
+        t.changeView("active")
     case '3':
-        t.view = "inactive"
-        t.cursor = 0
-        t.offset = 0
-        t.refreshSlice()
+        t.changeView("inactive")
     case '4':
-        t.view = "all"
-        t.cursor = 0
-        t.offset = 0
-        t.refreshSlice()
+        t.changeView("all")
     case 's':
-        if t.sortField == "title" {
-            t.sortField = "year"
-        } else if t.sortField == "year" {
-            t.sortField = "rating"
-        } else if t.sortField == "rating" {
-            t.sortField = "title"
-        }
-        t.cursor = 0
-        t.offset = 0
-        t.sort()
+        t.toggleSort()
     case 'D':
         if len(t.slice) > 0 {
             for i := range *t.entries {
@@ -129,11 +129,7 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
             }
         }
     case 'r':
-        if t.ratings {
-            t.ratings = false
-        } else {
-            t.ratings = true
-        }
+        t.ratings = !t.ratings
     case 'a':
         if len(t.slice) > 0 {
             if t.slice[t.cursor].State == "passive" {
