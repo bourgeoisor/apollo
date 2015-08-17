@@ -25,7 +25,7 @@ func (t *EntriesTab) Name() string {
     return t.name
 }
 
-func (t *MoviesTab) Status() string {
+func (t *EntriesTab) Status() string {
     return t.status
 }
 

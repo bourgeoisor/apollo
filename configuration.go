@@ -16,6 +16,7 @@ func newConfiguration() *Configuration {
     options := map[string]string{
         "autotag": "false",
         "movies_tab": "false",
+        "games_tab": "false",
         "debug": "false",
     }
 

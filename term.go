@@ -68,6 +68,10 @@ func newApollo() *Apollo {
         a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
     }
 
+    if a.c.get("games_tab") == "true" {
+        a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
+    }
+
     a.printWelcome()
 
     return a
@@ -238,6 +242,8 @@ func (a *Apollo) openTab(name string) error {
     switch name {
     case "movies":
         a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
+    case "games":
+        a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
     default:
         return errors.New("term: tab does not exist")
     }
