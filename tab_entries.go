@@ -18,6 +18,7 @@ type EntriesTab struct {
     cursor int
     ratings bool
     search []Entry
+    additionalField string
 }
 
 func (t *EntriesTab) Name() string {
@@ -40,7 +41,9 @@ func (t *EntriesTab) toggleSort() {
         t.sortField = "year"
     } else if t.sortField == "year" {
         t.sortField = "rating"
-    } else if t.sortField == "rating" {
+    } else if t.sortField == "rating" && t.additionalField != "" {
+        t.sortField = t.additionalField
+    } else {
         t.sortField = "title"
     }
 
@@ -347,13 +350,22 @@ func (t *EntriesTab) sort() {
         return e1.Rating < e2.Rating
     }
 
+    info1 := func(e1, e2 *Entry) bool {
+        return e1.Info1 < e2.Info1
+    }
+
     By(title).Sort(t.slice)
 
     if t.sortField == "year" {
         By(year).Sort(t.slice)
     } else if t.sortField == "rating" {
         By(rating).Sort(t.slice)
+    } else if t.sortField != "title" {
+        By(info1).Sort(t.slice)
     }
+
+    t.status = t.name + " - " + t.view + " (" + strconv.Itoa(len(t.slice)) +
+        " entries) sorted by " + t.sortField
 }
 
 func (t *EntriesTab) refreshSlice() {
@@ -384,6 +396,4 @@ func (t *EntriesTab) refreshSlice() {
             t.offset--
         }
     }
-
-    t.status = t.name + " - " + t.view + " (" + strconv.Itoa(len(t.slice)) + " entries)"
 }

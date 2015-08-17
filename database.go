@@ -13,6 +13,7 @@ type Entry struct {
     Year string
     TagID string
     Rating int
+    Info1 string
 }
 
 type Database struct {
