@@ -62,7 +62,12 @@ func newApollo() *Apollo {
         tabs: tabs,
     }
 
-    a.tabs = append(tabs, Tabber(newStatusTab(a)))
+    a.tabs = append(a.tabs, Tabber(newStatusTab(a)))
+
+    if a.c.get("movies_tab") == "true" {
+        a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
+    }
+
     a.printWelcome()
 
     return a

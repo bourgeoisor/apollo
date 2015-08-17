@@ -21,7 +21,6 @@ type OMDBData struct {
 
 type MoviesTab struct {
     EntriesTab
-    omdb OMDBData
 }
 
 func newMoviesTab(a *Apollo) *MoviesTab {
@@ -55,7 +54,7 @@ func (t *MoviesTab) HandleKeyEvent(ev *termbox.Event) bool {
 func (t *MoviesTab) Query(query string) {
     t.query(query)
 
-    if query[0] != ':' {
+    if query[0] != ':' && t.a.c.get("autotag") == "true" {
         t.a.inputActive = false
         t.fetchOMDBTags()
     }

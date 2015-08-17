@@ -13,6 +13,8 @@ type Configuration struct {
 
 func newConfiguration() *Configuration {
     options := map[string]string{
+        "autotag": "false",
+        "movies_tab": "false",
     }
 
     c := &Configuration{
@@ -33,9 +35,16 @@ func (c *Configuration) load() {
         return
     }
 
-    err = json.Unmarshal(cont, &c.options)
+    var options map[string]string
+    err = json.Unmarshal(cont, &options)
     if err != nil {
         log.Fatal(err)
+    }
+
+    for key, value := range options {
+        if _, exist := c.options[key]; exist {
+            c.options[key] = value
+        }
     }
 }
 
@@ -56,6 +65,8 @@ func (c *Configuration) set(option string, value string) {
     if _, exist := c.options[option]; exist {
         c.options[option] = value
     }
+
+    c.save()
 }
 
 func (c *Configuration) get(option string) string {

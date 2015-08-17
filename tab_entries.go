@@ -55,13 +55,24 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                 t.slice[t.cursor].Title = t.search[i].Title
                 t.slice[t.cursor].Year = t.search[i].Year
                 t.slice[t.cursor].TagID = t.search[i].TagID
+
+                t.view = "passive"
+                t.refreshSlice()
+
+                for j := range(t.slice) {
+                    if t.slice[j].TagID == t.search[i].TagID {
+                        t.cursor = j
+                        t.offset = 0
+                        if t.cursor > t.a.height - 4 {
+                            t.offset = t.cursor - (t.a.height - 4)
+                        }
+                    }
+                }
+
+                t.search = t.search[:0]
+                t.a.d.save()
             }
         }
-
-        t.search = t.search[:0]
-        t.a.d.save()
-        t.view = "passive"
-        t.refreshSlice()
 
         return true
     }
