@@ -18,7 +18,9 @@ type Entry struct {
 
 type Database struct {
     Movies []Entry
+    Series []Entry
     Games []Entry
+    Books []Entry
 }
 
 func newDatabase() *Database {
