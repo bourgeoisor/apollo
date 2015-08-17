@@ -244,7 +244,12 @@ func (t *EntriesTab) drawEntries() {
                 }
             }
 
-            runes := []rune(t.slice[j + t.offset].Year + " " + t.slice[j + t.offset].Title)
+            year := t.slice[j + t.offset].Year
+            if year == "" {
+                year = "    "
+            }
+            title := t.slice[j + t.offset].Title
+            runes := []rune(year + " " + title)
             for i := 0; i < len(runes); i++ {
                 fg := colors['d']
                 if i < 4 {
@@ -253,7 +258,7 @@ func (t *EntriesTab) drawEntries() {
                     } else if t.slice[j + t.offset].State == "inactive" {
                         fg = colors['b']
                     } else {
-                        fg = colors['r']
+                        fg = colors['Y']
                     }
                 }
 

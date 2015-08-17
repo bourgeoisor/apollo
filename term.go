@@ -169,27 +169,41 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 
 func (a *Apollo) drawStatusBars() {
     for i := 0; i < a.width; i++ {
-        termbox.SetCell(i, 0, ' ', colors['d'], colors['K'])
-        termbox.SetCell(i, a.height - 2, ' ', colors['d'], colors['K'])
+        termbox.SetCell(i, 0, ' ', colors['d'], colors['k'])
+        termbox.SetCell(i, a.height - 2, ' ', colors['d'], colors['k'])
     }
 }
 
 func (a *Apollo) drawTopStatus() {
     runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
     for i := 0; i < len(runes); i++ {
-        termbox.SetCell(i, 0, runes[i], colors['W'], colors['K'])
+        termbox.SetCell(i, 0, runes[i], colors['W'], colors['k'])
     }
 }
 
 func (a *Apollo) drawBottomStatus() {
     var str string
     for i := range a.tabs {
-        str += strconv.Itoa(i+1) + "." + a.tabs[i].Name() + " "
+        if i == a.currentTab {
+            str += "{" + strconv.Itoa(i+1) + "." + a.tabs[i].Name() + "} "
+        } else {
+            str += strconv.Itoa(i+1) + "." + a.tabs[i].Name() + " "
+        }
     }
 
+    fg := colors['w']
+    x := 0
     runes := []rune(str)
     for i := 0; i < len(runes); i++ {
-        termbox.SetCell(i, a.height - 2, runes[i], colors['W'], colors['K'])
+        if runes[i] == '{' {
+            fg = colors['W']
+            i++
+        } else if runes[i] == '}' {
+            fg = colors['w']
+            i++
+        }
+        termbox.SetCell(x, a.height - 2, runes[i], fg, colors['k'])
+        x++
     }
 }
 
