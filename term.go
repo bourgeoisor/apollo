@@ -99,7 +99,7 @@ func (a *Apollo) handleEvent(ev *termbox.Event) error {
 }
 
 func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
-    if !a.inputActive {
+    if !a.inputActive && ev.Mod != termbox.ModAlt {
         handled := a.tabs[a.currentTab].HandleKeyEvent(ev)
         if handled {
             return

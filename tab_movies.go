@@ -8,16 +8,6 @@ import (
     "strings"
 )
 
-type OMDBEntry struct {
-    Title string
-    Year string
-    ImdbID string
-}
-
-type OMDBData struct {
-    Search []OMDBEntry
-}
-
 type MoviesTab struct {
     EntriesTab
 }
@@ -59,6 +49,16 @@ func (t *MoviesTab) Query(query string) {
     }
 }
 
+type OMDBEntry struct {
+    Title string
+    Year string
+    ImdbID string
+}
+
+type OMDBData struct {
+    Search []OMDBEntry
+}
+
 func (t *MoviesTab) fetchOMDBTags() {
     title := strings.Replace(t.slice[t.cursor].Title, " ", "+", -1)
     url := "http://www.omdbapi.com/?s=" + title + "&type=movie&y=&plot=full&r=json"
@@ -81,14 +81,14 @@ func (t *MoviesTab) fetchOMDBTags() {
     if err != nil {
         t.a.logError(err.Error())
         return
-    } else {
-        for i := 0; i < len(data.Search); i++ {
-            t.search = append(t.search, Entry{
-                Title: data.Search[i].Title,
-                Year: data.Search[i].Year,
-                TagID: data.Search[i].ImdbID,
-            })
-        }
+    }
+
+    for i := 0; i < len(data.Search); i++ {
+        t.search = append(t.search, Entry{
+            Title: data.Search[i].Title,
+            Year: data.Search[i].Year,
+            TagID: data.Search[i].ImdbID,
+        })
     }
 
     if len(t.search) > 0 {

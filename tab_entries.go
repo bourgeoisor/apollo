@@ -65,6 +65,11 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
             t.a.input = []rune(":y " + t.slice[t.cursor].Year)
             t.a.inputCursor = len(t.a.input)
             return true
+        case '2':
+            t.a.inputActive = true
+            t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
+            t.a.inputCursor = len(t.a.input)
+            return true
         }
     }
 
@@ -77,6 +82,7 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                 t.slice[t.cursor].Title = t.search[i].Title
                 t.slice[t.cursor].Year = t.search[i].Year
                 t.slice[t.cursor].TagID = t.search[i].TagID
+                t.slice[t.cursor].Info1 = t.search[i].Info1
 
                 t.view = "passive"
                 t.refreshSlice()
@@ -220,11 +226,21 @@ func (t *EntriesTab) drawEditView() {
     for i := 0; i < len(runes); i++ {
         termbox.SetCell(i, 2, runes[i], colors['d'], colors['d'])
     }
+
+    if t.additionalField != "" {
+        runes = []rune("2. " + t.slice[t.cursor].Info1)
+        for i := 0; i < len(runes); i++ {
+            termbox.SetCell(i, 3, runes[i], colors['d'], colors['d'])
+        }
+    }
 }
 
 func (t *EntriesTab) drawTagView() {
     for j := 0; j < len(t.search); j++ {
         runes := []rune(strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title)
+        if t.search[j].Info1 != "" {
+            runes = []rune(strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title + " - " + t.search[j].Info1)
+        }
         for i := 0; i < len(runes); i++ {
             termbox.SetCell(i, j + 1, runes[i], colors['d'], colors['d'])
         }
@@ -249,7 +265,11 @@ func (t *EntriesTab) drawEntries() {
                 year = "    "
             }
             title := t.slice[j + t.offset].Title
+            info := t.slice[j + t.offset].Info1
             runes := []rune(year + " " + title)
+            if info != "" {
+                runes = []rune(year + " " + title + " [" + info + "]")
+            }
             for i := 0; i < len(runes); i++ {
                 fg := colors['d']
                 if i < 4 {
@@ -301,6 +321,8 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
         t.slice[t.cursor].Title = value
     case 'y':
         t.slice[t.cursor].Year = value
+    case 'i':
+        t.slice[t.cursor].Info1 = value
     }
 
     t.a.inputActive = false
