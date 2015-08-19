@@ -249,6 +249,7 @@ func (a *Apollo) log(str string) {
 
 func (a *Apollo) logError(str string) {
     a.log("{r}│ ERROR: {d}" + str)
+    log.Print(str)
 }
 
 func (a *Apollo) logDebug(str string) {
