@@ -14,11 +14,14 @@ type Entry struct {
     TagID string
     Rating int
     Info1 string
+    EpisodeDone int
+    EpisodeTotal int
 }
 
 type Database struct {
     Movies []Entry
     Series []Entry
+    Anime []Entry
     Games []Entry
     Books []Entry
 }

@@ -6,22 +6,22 @@ import (
     "net/http"
     "io/ioutil"
     "strings"
+    "strconv"
 )
 
-type BooksTab struct {
+type AnimeTab struct {
     EntriesTab
 }
 
-func newBooksTab(a *Apollo) *BooksTab {
-    t := &BooksTab{
+func newAnimeTab(a *Apollo) *AnimeTab {
+    t := &AnimeTab{
         EntriesTab: EntriesTab{
             a: a,
-            entries: &a.d.Books,
-            name: "books",
+            entries: &a.d.Anime,
+            name: "anime",
             sortField: "title",
-            status: "books",
+            status: "anime",
             view: "passive",
-            additionalField: "author",
         },
     }
 
@@ -30,10 +30,10 @@ func newBooksTab(a *Apollo) *BooksTab {
     return t
 }
 
-func (t *BooksTab) HandleKeyEvent(ev *termbox.Event) bool {
+func (t *AnimeTab) HandleKeyEvent(ev *termbox.Event) bool {
     switch ev.Ch {
     case 't':
-        t.fetchGoogleBooksTags()
+        t.fetchHummingbirdTags()
         return true
     }
 
@@ -41,33 +41,25 @@ func (t *BooksTab) HandleKeyEvent(ev *termbox.Event) bool {
 }
 
 
-func (t *BooksTab) Query(query string) {
+func (t *AnimeTab) Query(query string) {
     t.query(query)
 
     if query[0] != ':' && t.a.c.get("autotag") == "true" {
-        t.fetchGoogleBooksTags()
+        t.fetchHummingbirdTags()
         t.a.inputActive = false
     }
 }
 
-type GoogleBooksInfo struct {
+type HummingbirdEntry struct {
+    Id int
     Title string
-    Authors []string
-    PublishedDate string
+    Episode_count int
+    Started_airing string
 }
 
-type GoogleBooksEntry struct {
-    Id string
-    VolumeInfo GoogleBooksInfo
-}
-
-type GoogleBooksData struct {
-    Items []GoogleBooksEntry
-}
-
-func (t *BooksTab) fetchGoogleBooksTags() {
+func (t *AnimeTab) fetchHummingbirdTags() {
     title := strings.Replace(t.slice[t.cursor].Title, " ", "+", -1)
-    url := "https://www.googleapis.com/books/v1/volumes?q=" + title + "&projection=lite&printType=books&maxResults=10"
+    url := "http://hummingbird.me/api/v1/search/anime?query=" + title
     t.a.logDebug(url)
 
     res, err := http.Get(url)
@@ -82,22 +74,21 @@ func (t *BooksTab) fetchGoogleBooksTags() {
         return
     }
 
-    var data GoogleBooksData
+    var data []HummingbirdEntry
     err = json.Unmarshal(body, &data)
     if err != nil {
         t.a.logError(err.Error())
         return
     }
 
-    for i := 0; i < len(data.Items); i++ {
+    for i := 0; i < len(data); i++ {
         if i < 10 {
-            if len(data.Items[i].VolumeInfo.Authors) == 0 {
-                data.Items[i].VolumeInfo.Authors = append(data.Items[i].VolumeInfo.Authors, "")
-            }
+            releaseDate := strings.Split(data[i].Started_airing, "-")
             t.search = append(t.search, Entry{
-                Title: data.Items[i].VolumeInfo.Title,
-                TagID: data.Items[i].Id,
-                Info1: data.Items[i].VolumeInfo.Authors[0],
+                Title: data[i].Title,
+                TagID: strconv.Itoa(data[i].Id),
+                Year: releaseDate[0],
+                EpisodeTotal: data[i].Episode_count,
             })
         }
     }

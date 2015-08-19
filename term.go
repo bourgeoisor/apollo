@@ -72,6 +72,10 @@ func newApollo() *Apollo {
         a.tabs = append(a.tabs, Tabber(newSeriesTab(a)))
     }
 
+    if a.c.get("anime_tab") == "true" {
+        a.tabs = append(a.tabs, Tabber(newAnimeTab(a)))
+    }
+
     if a.c.get("games_tab") == "true" {
         a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
     }
@@ -266,6 +270,8 @@ func (a *Apollo) openTab(name string) error {
         a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
     case "series":
         a.tabs = append(a.tabs, Tabber(newSeriesTab(a)))
+    case "anime":
+        a.tabs = append(a.tabs, Tabber(newAnimeTab(a)))
     case "games":
         a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
     case "books":
