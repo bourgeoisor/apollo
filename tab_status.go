@@ -52,9 +52,9 @@ func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {
 }
 
 func (t *StatusTab) Draw() {
-    historySlice := t.history[200-t.a.height+3-t.offset:200-t.offset]
+    historySlice := t.history[200-t.a.height+2-t.offset:200-t.offset]
 
-    for j := 1; j < t.a.height - 3; j++ {
+    for j := 1; j < t.a.height - 2; j++ {
         t.a.drawString(0, j, historySlice[j])
     }
 }
