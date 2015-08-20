@@ -7,6 +7,7 @@ import (
     "io/ioutil"
     "strings"
     "strconv"
+    "log"
 )
 
 type AnimeTab struct {
@@ -20,8 +21,8 @@ func newAnimeTab(a *Apollo) *AnimeTab {
             entries: &a.d.Anime,
             name: "anime",
             sortField: "title",
-            status: "anime",
             view: "passive",
+            entryType: "episodic",
         },
     }
 
@@ -92,6 +93,9 @@ func (t *AnimeTab) fetchHummingbirdTags() {
             })
         }
     }
+
+    log.Print(data)
+    log.Print(t.search)
 
     if len(t.search) > 0 {
         t.view = "tag"

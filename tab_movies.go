@@ -19,8 +19,8 @@ func newMoviesTab(a *Apollo) *MoviesTab {
             entries: &a.d.Movies,
             name: "movies",
             sortField: "title",
-            status: "movies",
             view: "passive",
+            entryType: "default",
         },
     }
 

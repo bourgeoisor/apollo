@@ -171,6 +171,19 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
     }
 }
 
+func (a *Apollo) drawString(x, y int, str string) {
+    fg := colors['d']
+    runes := []rune(str)
+    for i := 0; i < len(runes); i++ {
+        if runes[i] == '{' {
+            fg = colors[runes[i+1]]
+            i += 3
+        }
+        termbox.SetCell(x, y, runes[i], fg, colors['d'])
+        x++
+    }
+}
+
 func (a *Apollo) drawStatusBars() {
     for i := 0; i < a.width; i++ {
         termbox.SetCell(i, 0, ' ', colors['d'], colors['k'])

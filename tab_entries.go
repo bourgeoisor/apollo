@@ -19,6 +19,7 @@ type EntriesTab struct {
     ratings bool
     search []Entry
     additionalField string
+    entryType string
 }
 
 func (t *EntriesTab) Name() string {
@@ -79,10 +80,8 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                                 '8': 8, '9': 9,}
         if i, exist := indexes[ev.Ch]; exist {
             if i < len(t.search) {
-                t.slice[t.cursor].Title = t.search[i].Title
-                t.slice[t.cursor].Year = t.search[i].Year
-                t.slice[t.cursor].TagID = t.search[i].TagID
-                t.slice[t.cursor].Info1 = t.search[i].Info1
+                *t.slice[t.cursor] = t.search[i]
+                t.slice[t.cursor].State = "passive"
 
                 t.view = "passive"
                 t.refreshSlice()
@@ -96,12 +95,11 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                         }
                     }
                 }
-
-                t.search = t.search[:0]
-                t.a.d.save()
             }
         }
 
+        t.search = t.search[:0]
+        t.a.d.save()
         return true
     }
 
@@ -152,17 +150,29 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
             t.a.d.save()
         }
     case 'z':
-        if len(t.slice) > 0 {
+        if len(t.slice) > 0 && t.ratings {
             if t.slice[t.cursor].Rating > 0 {
                 t.slice[t.cursor].Rating--
                 t.a.d.save()
             }
         }
     case 'x':
-        if len(t.slice) > 0 {
+        if len(t.slice) > 0 && t.ratings {
             if t.slice[t.cursor].Rating < 6 {
                 t.slice[t.cursor].Rating++
                 t.a.d.save()
+            }
+        }
+    case 'c':
+        if len(t.slice) > 0 && t.entryType == "episodic" {
+            if t.slice[t.cursor].EpisodeDone > 0 {
+                t.slice[t.cursor].EpisodeDone--
+            }
+        }
+    case 'v':
+        if len(t.slice) > 0 && t.entryType == "episodic" {
+            if t.slice[t.cursor].EpisodeDone < t.slice[t.cursor].EpisodeTotal {
+                t.slice[t.cursor].EpisodeDone++
             }
         }
     }
@@ -217,39 +227,33 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
 }
 
 func (t *EntriesTab) drawEditView() {
-    runes := []rune("0. " + t.slice[t.cursor].Title)
-    for i := 0; i < len(runes); i++ {
-        termbox.SetCell(i, 1, runes[i], colors['d'], colors['d'])
-    }
-
-    runes = []rune("1. " + t.slice[t.cursor].Year)
-    for i := 0; i < len(runes); i++ {
-        termbox.SetCell(i, 2, runes[i], colors['d'], colors['d'])
-    }
-
-    if t.additionalField != "" {
-        runes = []rune("2. " + t.slice[t.cursor].Info1)
-        for i := 0; i < len(runes); i++ {
-            termbox.SetCell(i, 3, runes[i], colors['d'], colors['d'])
-        }
+    t.a.drawString(0, 1, "{b}*───( Editing Entry )───")
+    t.a.drawString(0, 2, "{b}│ {d}0. " + t.slice[t.cursor].Title)
+    t.a.drawString(0, 3, "{b}│ {d}1. " + t.slice[t.cursor].Year)
+    if t.entryType == "additional" {
+        t.a.drawString(0, 4, "{b}│ {d}2. " + t.slice[t.cursor].Info1)
+        t.a.drawString(0, 5, "{b}*───*")
+    } else {
+        t.a.drawString(0, 4, "{b}*───*")
     }
 }
 
 func (t *EntriesTab) drawTagView() {
+    t.a.drawString(0, 1, "{b}*───( Tagging Entry )───")
     for j := 0; j < len(t.search); j++ {
-        runes := []rune(strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title)
-        if t.search[j].Info1 != "" {
-            runes = []rune(strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title + " - " + t.search[j].Info1)
+        str := "{b}│ {d}" + strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title
+        if t.entryType == "additional" {
+            str += " [" + t.search[j].Info1 + "]"
         }
-        for i := 0; i < len(runes); i++ {
-            termbox.SetCell(i, j + 1, runes[i], colors['d'], colors['d'])
-        }
+        t.a.drawString(0, j + 2, str)
     }
+    t.a.drawString(0, len(t.search) + 2, "{b}*───*")
 }
 
 func (t *EntriesTab) drawEntries() {
     for j := 0; j < t.a.height - 3; j++ {
         if j < len(t.slice) {
+            i := 3
             if t.ratings {
                 for i := 0; i < t.slice[j + t.offset].Rating; i++ {
                     if t.slice[j + t.offset].State == "passive" {
@@ -258,36 +262,44 @@ func (t *EntriesTab) drawEntries() {
                         termbox.SetCell(i + 3, j + 1, '*', colors['B'], colors['d'])
                     }
                 }
+                i = 10
             }
 
             year := t.slice[j + t.offset].Year
             if year == "" {
                 year = "    "
+            } else {
+                switch t.slice[j + t.offset].State {
+                case "passive":
+                    year = "{g}" + year + "{d}"
+                case "active":
+                    year = "{Y}" + year + "{d}"
+                case "inactive":
+                    year = "{b}" + year + "{d}"
+                }
             }
             title := t.slice[j + t.offset].Title
-            info := t.slice[j + t.offset].Info1
-            runes := []rune(year + " " + title)
-            if info != "" {
-                runes = []rune(year + " " + title + " [" + info + "]")
-            }
-            for i := 0; i < len(runes); i++ {
-                fg := colors['d']
-                if i < 4 {
-                    if t.slice[j + t.offset].State == "passive" {
-                        fg = colors['g']
-                    } else if t.slice[j + t.offset].State == "inactive" {
-                        fg = colors['b']
-                    } else {
-                        fg = colors['Y']
-                    }
-                }
 
-                if t.ratings {
-                    termbox.SetCell(i + 10, j + 1, runes[i], fg, colors['d'])
-                } else {
-                    termbox.SetCell(i + 3, j + 1, runes[i], fg, colors['d'])
+            var str string
+            if t.entryType == "additional" {
+                info := t.slice[j + t.offset].Info1
+                str = year + " " + title + " [{B}" + info + "{d}]"
+            } else if t.entryType == "episodic" {
+                episodeDone := strconv.Itoa(t.slice[j + t.offset].EpisodeDone)
+                if len(episodeDone) == 1 {
+                    episodeDone = " " + episodeDone
                 }
+                episodeTotal := strconv.Itoa(t.slice[j + t.offset].EpisodeTotal)
+                if len(episodeTotal) == 1 {
+                    episodeTotal = " " + episodeTotal
+                }
+                episodes := "[{B}" + episodeDone + "{d}/{b}" + episodeTotal + "{d}]"
+                str = episodes + " " + year + " " + title
+            } else if t.entryType == "default" {
+                str = year + " " + title
             }
+
+            t.a.drawString(i, j + 1, str)
         }
     }
 

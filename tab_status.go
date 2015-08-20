@@ -55,17 +55,7 @@ func (t *StatusTab) Draw() {
     historySlice := t.history[200-t.a.height+3-t.offset:200-t.offset]
 
     for j := 1; j < t.a.height - 3; j++ {
-        fg := colors['d']
-        x := 0
-        runes := []rune(historySlice[j])
-        for i := 0; i < len(runes); i++ {
-            if runes[i] == '{' {
-                fg = colors[runes[i+1]]
-                i += 3
-            }
-            termbox.SetCell(x, j, runes[i], fg, colors['d'])
-            x++
-        }
+        t.a.drawString(0, j, historySlice[j])
     }
 }
 

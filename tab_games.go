@@ -19,9 +19,9 @@ func newGamesTab(a *Apollo) *GamesTab {
             entries: &a.d.Games,
             name: "games",
             sortField: "title",
-            status: "games",
             view: "passive",
             additionalField: "platform",
+            entryType: "additional",
         },
     }
 

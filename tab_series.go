@@ -19,8 +19,8 @@ func newSeriesTab(a *Apollo) *SeriesTab {
             entries: &a.d.Series,
             name: "series",
             sortField: "title",
-            status: "series",
             view: "passive",
+            entryType: "episodic",
         },
     }
 

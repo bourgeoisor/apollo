@@ -19,9 +19,9 @@ func newBooksTab(a *Apollo) *BooksTab {
             entries: &a.d.Books,
             name: "books",
             sortField: "title",
-            status: "books",
             view: "passive",
             additionalField: "author",
+            entryType: "additional",
         },
     }
 
