@@ -14,12 +14,8 @@ type Configuration struct {
 
 func newConfiguration() *Configuration {
     options := map[string]string{
-        "autotag": "false",
-        "movies_tab": "false",
-        "series_tab": "false",
-        "anime_tab": "false",
-        "games_tab": "false",
-        "books_tab": "false",
+        "auto-tag": "false",
+        "tabs-startup": "",
         "debug": "false",
     }
 

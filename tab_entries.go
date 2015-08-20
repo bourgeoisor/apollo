@@ -20,6 +20,24 @@ type EntriesTab struct {
     search []Entry
     additionalField string
     entryType string
+    taggingAPI string
+}
+
+func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, additionalField string, taggingAPI string) *EntriesTab {
+    t := &EntriesTab{
+        a: a,
+        entries: entries,
+        name: name,
+        sortField: "title",
+        view: "passive",
+        entryType: entryType,
+        additionalField: additionalField,
+        taggingAPI: taggingAPI,
+    }
+
+    t.refreshSlice()
+
+    return t
 }
 
 func (t *EntriesTab) Name() string {
@@ -53,7 +71,7 @@ func (t *EntriesTab) toggleSort() {
     t.sort()
 }
 
-func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
+func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) bool {
     if t.view == "edit" {
         switch ev.Ch {
         case '0':
@@ -135,6 +153,8 @@ func (t *EntriesTab) handleKeyEvent(ev *termbox.Event) bool {
                 t.refreshSlice()
             }
         }
+    case 't':
+        t.fetchTags()
     case 'r':
         t.ratings = !t.ratings
     case 'a':
@@ -340,9 +360,13 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
     t.a.inputActive = false
 }
 
-func (t *EntriesTab) query(query string) {
+func (t *EntriesTab) Query(query string) {
     if query[0] != ':' {
         t.appendEntry(Entry{Title: query, State: "passive"})
+        if t.a.c.get("auto-tag") == "true" {
+            t.a.inputActive = false
+            t.fetchTags()
+        }
     } else {
         t.editCurrentEntry(rune(query[1]), query[3:])
     }

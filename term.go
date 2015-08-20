@@ -5,6 +5,7 @@ import (
     "os"
     "log"
     "strconv"
+    "strings"
     "unicode"
     "errors"
 )
@@ -64,27 +65,13 @@ func newApollo() *Apollo {
 
     a.tabs = append(a.tabs, Tabber(newStatusTab(a)))
 
-    if a.c.get("movies_tab") == "true" {
-        a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
-    }
-
-    if a.c.get("series_tab") == "true" {
-        a.tabs = append(a.tabs, Tabber(newSeriesTab(a)))
-    }
-
-    if a.c.get("anime_tab") == "true" {
-        a.tabs = append(a.tabs, Tabber(newAnimeTab(a)))
-    }
-
-    if a.c.get("games_tab") == "true" {
-        a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
-    }
-
-    if a.c.get("books_tab") == "true" {
-        a.tabs = append(a.tabs, Tabber(newBooksTab(a)))
+    autoOpenTabs := strings.Split(a.c.get("tabs-startup"), ",")
+    for _, name := range autoOpenTabs {
+        a.openTab(name)
     }
 
     a.printWelcome()
+    a.currentTab = 0
 
     return a
 }
@@ -281,15 +268,15 @@ func (a *Apollo) openTab(name string) error {
 
     switch name {
     case "movies":
-        a.tabs = append(a.tabs, Tabber(newMoviesTab(a)))
+        a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Movies, "movies", "default", "", "omdb")))
     case "series":
-        a.tabs = append(a.tabs, Tabber(newSeriesTab(a)))
+        a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Series, "series", "episodic", "", "omdb")))
     case "anime":
-        a.tabs = append(a.tabs, Tabber(newAnimeTab(a)))
+        a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Anime, "anime", "episodic", "", "hummingbird")))
     case "games":
-        a.tabs = append(a.tabs, Tabber(newGamesTab(a)))
+        a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Games, "games", "additional", "platform", "gamesdb")))
     case "books":
-        a.tabs = append(a.tabs, Tabber(newBooksTab(a)))
+        a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Books, "books", "additional", "author", "googlebooks")))
     default:
         return errors.New("term: tab does not exist")
     }
