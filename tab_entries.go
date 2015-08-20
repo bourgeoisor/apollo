@@ -85,14 +85,27 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) bool {
             t.a.inputCursor = len(t.a.input)
             return true
         case '2':
-            t.a.inputActive = true
-            t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
-            t.a.inputCursor = len(t.a.input)
-            return true
+            if t.entryType == "additional" {
+                t.a.inputActive = true
+                t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
+                t.a.inputCursor = len(t.a.input)
+                return true
+            } else if t.entryType == "episodic" {
+                t.a.inputActive = true
+                t.a.input = []rune(":e " + strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
+                t.a.inputCursor = len(t.a.input)
+                return true
+            }
         }
     }
 
     if t.view == "tag" {
+        if ev.Ch == 'q' {
+            t.search = t.search[:0]
+            t.view = "passive"
+            return true
+        }
+
         indexes := map[rune]int{'0': 0, '1': 1, '2': 2, '3': 3,
                                 '4': 4, '5': 5, '6': 6, '7': 7,
                                 '8': 8, '9': 9,}
@@ -248,26 +261,33 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) bool {
 
 func (t *EntriesTab) drawEditView() {
     t.a.drawString(0, 1, "{b}*───( Editing Entry )───")
-    t.a.drawString(0, 2, "{b}│ {d}0. " + t.slice[t.cursor].Title)
-    t.a.drawString(0, 3, "{b}│ {d}1. " + t.slice[t.cursor].Year)
+    t.a.drawString(0, 2, "{b}│ {C}e. {d}Return to the entry list.")
+    t.a.drawString(0, 3, "{b}│")
+    t.a.drawString(0, 4, "{b}│ {C}0. {d}[{B}Title{d}]    " + t.slice[t.cursor].Title)
+    t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Year{d}]     " + t.slice[t.cursor].Year)
     if t.entryType == "additional" {
-        t.a.drawString(0, 4, "{b}│ {d}2. " + t.slice[t.cursor].Info1)
-        t.a.drawString(0, 5, "{b}*───*")
+        t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Info{d}]     " + t.slice[t.cursor].Info1)
+        t.a.drawString(0, 7, "{b}*───*")
+    } else if t.entryType == "episodic" {
+        t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Episodes{d}] " + strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
+        t.a.drawString(0, 7, "{b}*───*")
     } else {
-        t.a.drawString(0, 4, "{b}*───*")
+        t.a.drawString(0, 6, "{b}*───*")
     }
 }
 
 func (t *EntriesTab) drawTagView() {
     t.a.drawString(0, 1, "{b}*───( Tagging Entry )───")
+    t.a.drawString(0, 2, "{b}│ {C}q. {d}Cancel tagging.")
+    t.a.drawString(0, 3, "{b}│")
     for j := 0; j < len(t.search); j++ {
-        str := "{b}│ {d}" + strconv.Itoa(j) + ". [" + t.search[j].Year + "] " + t.search[j].Title
+        str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + t.search[j].Year + "{d}] " + t.search[j].Title
         if t.entryType == "additional" {
             str += " [" + t.search[j].Info1 + "]"
         }
-        t.a.drawString(0, j + 2, str)
+        t.a.drawString(0, j + 4, str)
     }
-    t.a.drawString(0, len(t.search) + 2, "{b}*───*")
+    t.a.drawString(0, len(t.search) + 4, "{b}*───*")
 }
 
 func (t *EntriesTab) drawEntries() {
@@ -353,6 +373,11 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
         t.slice[t.cursor].Title = value
     case 'y':
         t.slice[t.cursor].Year = value
+    case 'e':
+        episodeTotal, err := strconv.Atoi(value)
+        if err == nil {
+            t.slice[t.cursor].EpisodeTotal = episodeTotal
+        }
     case 'i':
         t.slice[t.cursor].Info1 = value
     }

@@ -143,12 +143,14 @@ func (t *EntriesTab) fetchGamesDBTags(body *[]byte) {
     for i := 0; i < len(data.Game); i++ {
         if i < 10 {
             releaseDate := strings.Split(data.Game[i].ReleaseDate, "/")
-            t.search = append(t.search, Entry{
-                Title: data.Game[i].GameTitle,
-                Year: releaseDate[2],
-                TagID: data.Game[i].id,
-                Info1: platforms[data.Game[i].Platform],
-            })
+            if len(releaseDate) > 2 {
+                t.search = append(t.search, Entry{
+                    Title: data.Game[i].GameTitle,
+                    Year: releaseDate[2],
+                    TagID: data.Game[i].id,
+                    Info1: platforms[data.Game[i].Platform],
+                })
+            }
         }
     }
 }
