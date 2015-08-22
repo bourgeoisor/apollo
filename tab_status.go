@@ -32,7 +32,7 @@ func (t *StatusTab) Status() string {
     return t.status
 }
 
-func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {
+func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) {
     switch ev.Key {
     case termbox.KeyPgup:
         t.offset += 5
@@ -44,11 +44,7 @@ func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) bool {
         if t.offset < 0 {
             t.offset = 0
         }
-    default:
-        return false
     }
-
-    return true
 }
 
 func (t *StatusTab) Draw() {

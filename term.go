@@ -25,7 +25,7 @@ var colors map[rune]termbox.Attribute = map[rune]termbox.Attribute{
 type Tabber interface {
     Name() string
     Status() string
-    HandleKeyEvent(*termbox.Event) bool
+    HandleKeyEvent(*termbox.Event)
     Draw()
     Query(string)
 }
@@ -90,11 +90,16 @@ func (a *Apollo) handleEvent(ev *termbox.Event) error {
 }
 
 func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
-    if !a.inputActive && ev.Mod != termbox.ModAlt {
-        handled := a.tabs[a.currentTab].HandleKeyEvent(ev)
-        if handled {
-            return
+    if ev.Mod == termbox.ModAlt {
+        indexes := map[rune]int{'1': 1, '2': 2, '3': 3,
+                                '4': 4, '5': 5, '6': 6,
+                                '7': 7, '8': 8, '9': 9,}
+        if i, exist := indexes[ev.Ch]; exist {
+            if len(a.tabs) > i - 1 {
+                a.currentTab = i - 1
+            }
         }
+        return
     }
 
     switch ev.Key {
@@ -111,24 +116,6 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
             a.inputCursor = 0
         } else {
             a.inputActive = !a.inputActive
-        }
-    default:
-        if ev.Mod == termbox.ModAlt {
-            indexes := map[rune]int{'1': 1, '2': 2, '3': 3,
-                                    '4': 4, '5': 5, '6': 6,
-                                    '7': 7, '8': 8, '9': 9,}
-            if i, exist := indexes[ev.Ch]; exist {
-                if len(a.tabs) > i - 1 {
-                    a.currentTab = i - 1
-                }
-            }
-        } else {
-            if unicode.IsPrint(ev.Ch) && a.inputActive {
-                a.input = append(a.input, ' ')
-                copy(a.input[a.inputCursor+1:], a.input[a.inputCursor:])
-                a.input[a.inputCursor] = ev.Ch
-                a.inputCursor++
-            }
         }
     }
 
@@ -154,7 +141,16 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
             if a.inputCursor > len(a.input) {
                 a.inputCursor = len(a.input)
             }
+        default:
+            if unicode.IsPrint(ev.Ch) {
+                a.input = append(a.input, ' ')
+                copy(a.input[a.inputCursor+1:], a.input[a.inputCursor:])
+                a.input[a.inputCursor] = ev.Ch
+                a.inputCursor++
+            }
         }
+    } else {
+        a.tabs[a.currentTab].HandleKeyEvent(ev)
     }
 }
 

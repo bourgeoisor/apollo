@@ -1,6 +1,6 @@
 package main
 
-const version = "Apollo v.0.3.2"
+const version = "Apollo v.0.3.3"
 
 func (a *Apollo) printHelp() {
     s := []string {
