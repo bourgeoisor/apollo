@@ -122,11 +122,11 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
                         }
                     }
                 }
+                t.search = t.search[:0]
+                t.a.d.save()
             }
         }
 
-        t.search = t.search[:0]
-        t.a.d.save()
     } else {
         switch ev.Ch {
         case '1':
