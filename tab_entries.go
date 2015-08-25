@@ -4,6 +4,8 @@ import (
     "github.com/nsf/termbox-go"
     "strconv"
     "sort"
+    "os"
+    "io/ioutil"
 )
 
 type EntriesTab struct {
@@ -69,6 +71,44 @@ func (t *EntriesTab) toggleSort() {
     t.cursor = 0
     t.offset = 0
     t.sort()
+}
+
+func (t *EntriesTab) printEntriesToFile() {
+    var cont string
+    for j := 0; j < len(t.slice); j++ {
+        year := t.slice[j].Year
+        if year == "" {
+            year = "    "
+        }
+        title := t.slice[j].Title
+
+        var str string
+        if t.entryType == "additional" {
+            info := t.slice[j].Info1
+            str = year + " " + title + " [" + info + "]"
+        } else if t.entryType == "episodic" {
+            episodeDone := strconv.Itoa(t.slice[j].EpisodeDone)
+            if len(episodeDone) == 1 {
+                episodeDone = " " + episodeDone
+            }
+            episodeTotal := strconv.Itoa(t.slice[j].EpisodeTotal)
+            if len(episodeTotal) == 1 {
+                episodeTotal = " " + episodeTotal
+            }
+            episodes := "[" + episodeDone + "/" + episodeTotal + "]"
+            str = episodes + " " + year + " " + title
+        } else if t.entryType == "default" {
+            str = year + " " + title
+        }
+
+        cont += str + "\n"
+    }
+
+    path := os.Getenv("HOME") + "/apollo_print.txt"
+    err := ioutil.WriteFile(path, []byte(cont), 0644)
+    if err != nil {
+        t.a.logError(err.Error())
+    }
 }
 
 func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
@@ -205,6 +245,8 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
                 }
                 t.a.d.save()
             }
+        case 'p':
+            t.printEntriesToFile()
         }
 
         switch ev.Key {

@@ -1,6 +1,6 @@
 package main
 
-const version = "Apollo v.0.3.3"
+const version = "Apollo v.0.3.4"
 
 func (a *Apollo) printHelp() {
     s := []string {
@@ -96,6 +96,7 @@ func (a *Apollo) printDetailedHelp(subject string) {
             "{b}│ {d}a..............Toggle the current entry's state",
             "{b}│ {d}z/x............Change the rating of the current entry",
             "{b}│ {d}c/v............Change the current episode of an entry",
+            "{b}│ {d}p..............Print the current entries to a file",
             "{b}*───*",
         }
     default:
