@@ -187,15 +187,23 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
             }
         case 'c':
             if len(t.slice) > 0 && t.entryType == "episodic" {
+                t.slice[t.cursor].State = "active"
                 if t.slice[t.cursor].EpisodeDone > 0 {
                     t.slice[t.cursor].EpisodeDone--
+                } else {
+                    t.slice[t.cursor].State = "inactive"
                 }
+                t.a.d.save()
             }
         case 'v':
             if len(t.slice) > 0 && t.entryType == "episodic" {
                 if t.slice[t.cursor].EpisodeDone < t.slice[t.cursor].EpisodeTotal {
                     t.slice[t.cursor].EpisodeDone++
+                    t.slice[t.cursor].State = "active"
+                } else {
+                    t.slice[t.cursor].State = "passive"
                 }
+                t.a.d.save()
             }
         }
 

@@ -99,6 +99,7 @@ func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
                 TagID: strconv.Itoa(data[i].Id),
                 Year: releaseDate[0],
                 EpisodeTotal: data[i].Episode_count,
+                EpisodeDone: data[i].Episode_count,
             })
         }
     }
