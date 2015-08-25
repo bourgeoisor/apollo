@@ -52,7 +52,7 @@ func (a *Apollo) printDetailedHelp(subject string) {
             "{b}│ {d}/open <tab name>",
             "{b}│",
             "{b}│ {d}Opens a given tab or, if it already exists, selects it.",
-            "{b}│ {d}Tabs available: anime, series, games, and books.",
+            "{b}│ {d}Tabs available: anime, books, games, movies, series.",
             "{b}│ {d}For keybindings, use '/help tabs'",
             "{b}*───*",
         }
@@ -95,6 +95,7 @@ func (a *Apollo) printDetailedHelp(subject string) {
             "{b}│ {d}r..............Toggle ratings",
             "{b}│ {d}a..............Toggle the current entry's state",
             "{b}│ {d}z/x............Change the rating of the current entry",
+            "{b}│ {d}c/v............Change the current episode of an entry",
             "{b}*───*",
         }
     default:

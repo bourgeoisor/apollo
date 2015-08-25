@@ -74,7 +74,6 @@ func (t *EntriesTab) fetchOMDBTags(body *[]byte) {
             TagID: data.Search[i].ImdbID,
         })
     }
-
 }
 
 func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
