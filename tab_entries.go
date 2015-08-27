@@ -37,6 +37,10 @@ func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, a
         taggingAPI: taggingAPI,
     }
 
+    if t.a.c.get("rating-startup") == "true" {
+        t.ratings = true
+    }
+
     t.refreshSlice()
 
     return t

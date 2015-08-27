@@ -16,6 +16,7 @@ func newConfiguration() *Configuration {
     options := map[string]string{
         "auto-tag": "false",
         "tabs-startup": "",
+        "rating-startup": "false",
         "debug": "false",
     }
 
