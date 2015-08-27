@@ -78,7 +78,7 @@ func (t *EntriesTab) printEntriesToFile() {
     for j := 0; j < len(t.slice); j++ {
         year := t.slice[j].Year
         if year == "" {
-            year = "    "
+            year = "----"
         }
         title := t.slice[j].Title
 
@@ -89,11 +89,11 @@ func (t *EntriesTab) printEntriesToFile() {
         } else if t.entryType == "episodic" {
             episodeDone := strconv.Itoa(t.slice[j].EpisodeDone)
             if len(episodeDone) == 1 {
-                episodeDone = " " + episodeDone
+                episodeDone = "0" + episodeDone
             }
             episodeTotal := strconv.Itoa(t.slice[j].EpisodeTotal)
             if len(episodeTotal) == 1 {
-                episodeTotal = " " + episodeTotal
+                episodeTotal = "0" + episodeTotal
             }
             episodes := "[" + episodeDone + "/" + episodeTotal + "]"
             str = episodes + " " + year + " " + title
@@ -317,9 +317,15 @@ func (t *EntriesTab) drawTagView() {
     t.a.drawString(0, 2, "{b}│ {C}q. {d}Cancel tagging.")
     t.a.drawString(0, 3, "{b}│")
     for j := 0; j < len(t.search); j++ {
-        str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + t.search[j].Year + "{d}] " + t.search[j].Title
+        year := t.search[j].Year
+        if year == "" {
+            year = "----"
+        }
+        str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + year + "{d}] " + t.search[j].Title
         if t.entryType == "additional" {
             str += " [" + t.search[j].Info1 + "]"
+        } else if t.entryType == "episodic" {
+            str += " [" + strconv.Itoa(t.search[j].EpisodeTotal) + "]"
         }
         t.a.drawString(0, j + 4, str)
     }
@@ -343,16 +349,15 @@ func (t *EntriesTab) drawEntries() {
 
             year := t.slice[j + t.offset].Year
             if year == "" {
-                year = "    "
-            } else {
-                switch t.slice[j + t.offset].State {
-                case "passive":
-                    year = "{g}" + year + "{d}"
-                case "active":
-                    year = "{Y}" + year + "{d}"
-                case "inactive":
-                    year = "{b}" + year + "{d}"
-                }
+                year = "----"
+            }
+            switch t.slice[j + t.offset].State {
+            case "passive":
+                year = "{g}" + year + "{d}"
+            case "active":
+                year = "{Y}" + year + "{d}"
+            case "inactive":
+                year = "{b}" + year + "{d}"
             }
             title := t.slice[j + t.offset].Title
 
@@ -363,11 +368,11 @@ func (t *EntriesTab) drawEntries() {
             } else if t.entryType == "episodic" {
                 episodeDone := strconv.Itoa(t.slice[j + t.offset].EpisodeDone)
                 if len(episodeDone) == 1 {
-                    episodeDone = " " + episodeDone
+                    episodeDone = "0" + episodeDone
                 }
                 episodeTotal := strconv.Itoa(t.slice[j + t.offset].EpisodeTotal)
                 if len(episodeTotal) == 1 {
-                    episodeTotal = " " + episodeTotal
+                    episodeTotal = "0" + episodeTotal
                 }
                 episodes := "[{B}" + episodeDone + "{d}/{b}" + episodeTotal + "{d}]"
                 str = episodes + " " + year + " " + title
