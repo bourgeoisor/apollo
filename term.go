@@ -97,6 +97,7 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
         if i, exist := indexes[ev.Ch]; exist {
             if len(a.tabs) > i - 1 {
                 a.currentTab = i - 1
+                a.tabs[a.currentTab].Query("!focused")
             }
         }
         return

@@ -56,6 +56,8 @@ func (t *StatusTab) Draw() {
 }
 
 func (t *StatusTab) Query(query string) {
-    t.history = t.history[1:]
-    t.history = append(t.history, query)
+    if query[0] != '!' {
+        t.history = t.history[1:]
+        t.history = append(t.history, query)
+    }
 }

@@ -55,9 +55,9 @@ func (t *EntriesTab) Status() string {
 }
 
 func (t *EntriesTab) changeView(view string) {
-    t.view = view
     t.cursor = 0
     t.offset = 0
+    t.view = view
     t.refreshSlice()
 }
 
@@ -431,14 +431,23 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 }
 
 func (t *EntriesTab) Query(query string) {
-    if query[0] != ':' {
+    if query[0] == ':' {
+        t.editCurrentEntry(rune(query[1]), query[3:])
+    } else if query == "!focused" {
+        t.cursor = 0
+        t.offset = 0
+        t.view = "active"
+        t.refreshSlice()
+        if len(t.slice) == 0 {
+            t.view = "passive"
+            t.refreshSlice()
+        }
+    } else {
         t.appendEntry(Entry{Title: query, State: "passive"})
         if t.a.c.get("auto-tag") == "true" {
             t.a.inputActive = false
             t.fetchTags()
         }
-    } else {
-        t.editCurrentEntry(rune(query[1]), query[3:])
     }
 }
 
