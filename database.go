@@ -1,63 +1,63 @@
 package main
 
 import (
-    "log"
-    "os"
-    "io/ioutil"
-    "encoding/json"
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 type Entry struct {
-    Title string
-    State string
-    Year string
-    TagID string
-    Rating int
-    Info1 string
-    EpisodeDone int
-    EpisodeTotal int
+	Title        string
+	State        string
+	Year         string
+	TagID        string
+	Rating       int
+	Info1        string
+	EpisodeDone  int
+	EpisodeTotal int
 }
 
 type Database struct {
-    Movies []Entry
-    Series []Entry
-    Anime []Entry
-    Games []Entry
-    Books []Entry
+	Movies []Entry
+	Series []Entry
+	Anime  []Entry
+	Games  []Entry
+	Books  []Entry
 }
 
 func newDatabase() *Database {
-    d := &Database{}
+	d := &Database{}
 
-    d.load()
-    d.save()
+	d.load()
+	d.save()
 
-    return d
+	return d
 }
 
 func (d *Database) load() {
-    path := os.Getenv("HOME") + "/.config/apollo/database.json"
-    cont, err := ioutil.ReadFile(path)
-    if err != nil {
-        log.Print(err)
-        return
-    }
+	path := os.Getenv("HOME") + "/.config/apollo/database.json"
+	cont, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Print(err)
+		return
+	}
 
-    err = json.Unmarshal(cont, d)
-    if err != nil {
-        log.Fatal(err)
-    }
+	err = json.Unmarshal(cont, d)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (d *Database) save() {
-    cont, err := json.Marshal(d)
-    if err != nil {
-        log.Fatal(err)
-    }
+	cont, err := json.Marshal(d)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    path := os.Getenv("HOME") + "/.config/apollo/database.json"
-    err = ioutil.WriteFile(path, cont, 0644)
-    if err != nil {
-        log.Print(err)
-    }
+	path := os.Getenv("HOME") + "/.config/apollo/database.json"
+	err = ioutil.WriteFile(path, cont, 0644)
+	if err != nil {
+		log.Print(err)
+	}
 }
