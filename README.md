@@ -41,8 +41,24 @@ Key-bindings
 Installation
 ------------
 
-Current Development State
--------------------------
+This whole project was done using [Golang](https://golang.org/doc/install).
+
+Once it's installed properly, fetch the repository.
+
+    go get github.com/finiks/apollo
+
+Next, move to the repository source of the project and compile the application.
+
+    cd $GOPATH/src/github/finiks/apollo
+    go install
+
+Lastly, you can run Apollo through it's binary file.
+
+    cd $GOPATH/bin
+    ./apollo
+
+At the first launch, `configuration.json` and `database.json` will be created and stored
+in `~/.config/apollo/`.
 
 APIs Used
 ---------
