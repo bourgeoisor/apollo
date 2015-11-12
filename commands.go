@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// HandleCommand takes the latest user input, parses it, and calls the wanted function.
 func (a *Apollo) handleCommand() {
 	args := strings.Split(string(a.input), " ")
 	command := args[0]

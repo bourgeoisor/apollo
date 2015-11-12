@@ -4,6 +4,7 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
+// StatusTab is a tab for displaying logs implementing Tabber.
 type StatusTab struct {
 	a      *Apollo
 	name   string
@@ -13,6 +14,7 @@ type StatusTab struct {
 	offset  int
 }
 
+// NewStatusTab creates a new StatusTab and returns it.
 func newStatusTab(a *Apollo) *StatusTab {
 	t := &StatusTab{
 		a:       a,
@@ -24,14 +26,17 @@ func newStatusTab(a *Apollo) *StatusTab {
 	return t
 }
 
+// Name returns the name of the tab.
 func (t *StatusTab) Name() string {
 	return t.name
 }
 
+// Status returns the status of the tab.
 func (t *StatusTab) Status() string {
 	return t.status
 }
 
+// HandleKeyEvent handles the changes in logs offsets.
 func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) {
 	switch ev.Key {
 	case termbox.KeyPgup:
@@ -47,6 +52,7 @@ func (t *StatusTab) HandleKeyEvent(ev *termbox.Event) {
 	}
 }
 
+// Draw creates a slice of the logs history and draws it on the screen.
 func (t *StatusTab) Draw() {
 	historySlice := t.history[200-t.a.height+2-t.offset : 200-t.offset]
 
@@ -55,6 +61,7 @@ func (t *StatusTab) Draw() {
 	}
 }
 
+// Query adds a new string to the list of logs.
 func (t *StatusTab) Query(query string) {
 	if query[0] != '!' {
 		t.history = t.history[1:]

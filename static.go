@@ -1,7 +1,9 @@
 package main
 
+// Version is the version number of the application.
 const version = "Apollo v.0.3.5"
 
+// PrintHelp prints out the help guide to the logs.
 func (a *Apollo) printHelp() {
 	s := []string{
 		"{b}*───( Main Help Guide )───*",
@@ -26,6 +28,7 @@ func (a *Apollo) printHelp() {
 	}
 }
 
+// PrintDetailedHelp prints out the detailed help of a function to the logs.
 func (a *Apollo) printDetailedHelp(subject string) {
 	var s []string
 	switch subject {
@@ -110,6 +113,7 @@ func (a *Apollo) printDetailedHelp(subject string) {
 	}
 }
 
+// PrintWelcome prints out the welcome message to the logs.
 func (a *Apollo) printWelcome() {
 	a.log("{b}*───( " + version + " )───*")
 	a.log("{b}│ {d}This software is under heavy developpment and may contain bugs and glitches.")
@@ -117,6 +121,7 @@ func (a *Apollo) printWelcome() {
 	a.log("{b}*───*")
 }
 
+// PrintConfig prints out the list of configuration options to the logs.
 func (a *Apollo) printConfig() {
 	a.log("{b}*───( Current Configuration )───*")
 	for _, value := range a.c.config() {

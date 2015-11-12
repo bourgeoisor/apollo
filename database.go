@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// Entry is a single media title.
 type Entry struct {
 	Title        string
 	State        string
@@ -18,6 +19,7 @@ type Entry struct {
 	EpisodeTotal int
 }
 
+// Database is the entirety of all media titles.
 type Database struct {
 	Movies []Entry
 	Series []Entry
@@ -26,6 +28,7 @@ type Database struct {
 	Books  []Entry
 }
 
+// NewDatabase creates a new Database and returns it.
 func newDatabase() *Database {
 	d := &Database{}
 
@@ -35,6 +38,7 @@ func newDatabase() *Database {
 	return d
 }
 
+// Load fetches the user's database from a file.
 func (d *Database) load() {
 	path := os.Getenv("HOME") + "/.config/apollo/database.json"
 	cont, err := ioutil.ReadFile(path)
@@ -49,6 +53,7 @@ func (d *Database) load() {
 	}
 }
 
+// Save takes the database and saves it to a file.
 func (d *Database) save() {
 	cont, err := json.Marshal(d)
 	if err != nil {

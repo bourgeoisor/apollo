@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// FetchTags calls the correct API fetch function for the current title entry.
 func (t *EntriesTab) fetchTags() {
 	title := strings.Replace(t.slice[t.cursor].Title, " ", "+", -1)
 	urls := map[string]string{
@@ -50,6 +51,7 @@ func (t *EntriesTab) fetchTags() {
 	}
 }
 
+// EntryState returns the current view, os returns "passive" if the view is "all".
 func (t *EntriesTab) entryState() string {
 	if t.view == "all" {
 		return "passive"
@@ -57,6 +59,7 @@ func (t *EntriesTab) entryState() string {
 	return t.view
 }
 
+// FetchOMDBTags calls the API to lookup a search on the current title entry. It then saves the results.
 func (t *EntriesTab) fetchOMDBTags(body *[]byte) {
 	type OMDBEntry struct {
 		Title  string
@@ -85,6 +88,7 @@ func (t *EntriesTab) fetchOMDBTags(body *[]byte) {
 	}
 }
 
+// FetchHummingbirdTags calls the API to lookup a search on the current title entry. It then saves the results.
 func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
 	type HummingbirdEntry struct {
 		Id             int
@@ -119,6 +123,7 @@ func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
 	}
 }
 
+// FetchGamesDBTags calls the API to lookup a search on the current title entry. It then saves the results.
 func (t *EntriesTab) fetchGamesDBTags(body *[]byte) {
 	type Game struct {
 		id          string
@@ -170,6 +175,7 @@ func (t *EntriesTab) fetchGamesDBTags(body *[]byte) {
 	}
 }
 
+// FetchGoogleBooksTags calls the API to lookup a search on the current title entry. It then saves the results.
 func (t *EntriesTab) fetchGoogleBooksTags(body *[]byte) {
 	type GoogleBooksInfo struct {
 		Title         string

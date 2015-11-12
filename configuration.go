@@ -8,10 +8,12 @@ import (
 	"os"
 )
 
+// Configuration is a map of all the configuration values.
 type Configuration struct {
 	options map[string]string
 }
 
+// NewConfiguraion creates a new Configuration with default values and returns it.
 func newConfiguration() *Configuration {
 	options := map[string]string{
 		"auto-tag":       "false",
@@ -30,6 +32,7 @@ func newConfiguration() *Configuration {
 	return c
 }
 
+// Load fetches the user's configuration options from a file.
 func (c *Configuration) load() {
 	path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
 	cont, err := ioutil.ReadFile(path)
@@ -51,6 +54,7 @@ func (c *Configuration) load() {
 	}
 }
 
+// Save takes the map of configuration options and saves it to a file.
 func (c *Configuration) save() {
 	cont, err := json.Marshal(c.options)
 	if err != nil {
@@ -64,6 +68,7 @@ func (c *Configuration) save() {
 	}
 }
 
+// Set changes the value of a specific configuration option. It then saves the configuration.
 func (c *Configuration) set(option string, value string) error {
 	if _, exist := c.options[option]; exist {
 		c.options[option] = value
@@ -75,6 +80,7 @@ func (c *Configuration) set(option string, value string) error {
 	return nil
 }
 
+// Get returns the value of a specific configuration option.
 func (c *Configuration) get(option string) string {
 	if value, exist := c.options[option]; exist {
 		return value
@@ -83,6 +89,7 @@ func (c *Configuration) get(option string) string {
 	return ""
 }
 
+// Config returns the list of all the configuration values.
 func (c *Configuration) config() []string {
 	var s []string
 
