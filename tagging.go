@@ -53,9 +53,8 @@ func (t *EntriesTab) fetchTags() {
 func (t *EntriesTab) entryState() string {
 	if t.view == "all" {
 		return "passive"
-	} else {
-		return t.view
 	}
+	return t.view
 }
 
 func (t *EntriesTab) fetchOMDBTags(body *[]byte) {
