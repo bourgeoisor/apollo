@@ -12,6 +12,13 @@ Screenshot
 Features
 --------
 
+- Create lists for movies, TV series, video games, and books.
+- Sort the lists by year released, status, or ranking.
+- Rank each titles on a scale of 1 to 6.
+- Auto-tag the titles using various public APIs.
+- State each entries as active, passive, or inactive.
+- Print any list to a plain text file.
+
 Commands
 --------
 
