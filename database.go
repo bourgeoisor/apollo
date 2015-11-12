@@ -43,7 +43,6 @@ func (d *Database) load() {
 	path := os.Getenv("HOME") + "/.config/apollo/database.json"
 	cont, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Print(err)
 		return
 	}
 

@@ -37,7 +37,6 @@ func (c *Configuration) load() {
 	path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
 	cont, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Print(err)
 		return
 	}
 
