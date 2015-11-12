@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// EntriesTab is a tab for displaying entries implementing Tabber.
 type EntriesTab struct {
 	a               *Apollo
 	entries         *[]Entry
@@ -26,6 +27,7 @@ type EntriesTab struct {
 	taggingAPI      string
 }
 
+// NewEntriesTab creates a new EntriesTab and returns it.
 func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, additionalField string, taggingAPI string) *EntriesTab {
 	t := &EntriesTab{
 		a:               a,
@@ -47,14 +49,17 @@ func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, a
 	return t
 }
 
+// Name returns the name of the tab.
 func (t *EntriesTab) Name() string {
 	return t.name
 }
 
+// Status returns the status of the tab.
 func (t *EntriesTab) Status() string {
 	return t.status
 }
 
+// ChangeView changes the current view for a specified one.
 func (t *EntriesTab) changeView(view string) {
 	t.cursor = 0
 	t.offset = 0
@@ -62,6 +67,7 @@ func (t *EntriesTab) changeView(view string) {
 	t.refreshSlice()
 }
 
+// ToggleSort switches between the different sorts.
 func (t *EntriesTab) toggleSort() {
 	if t.sortField == "title" {
 		t.sortField = "year"
@@ -78,6 +84,7 @@ func (t *EntriesTab) toggleSort() {
 	t.sort()
 }
 
+// PrintEntriesToFile saves the current view of entries to a file.
 func (t *EntriesTab) printEntriesToFile() {
 	var cont string
 	for j := 0; j < len(t.slice); j++ {
@@ -116,6 +123,7 @@ func (t *EntriesTab) printEntriesToFile() {
 	}
 }
 
+// HandleKeyEvent takes a key input and process it, calling the correct function.
 func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 	if t.view == "edit" {
 		switch ev.Ch {
@@ -298,6 +306,7 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 		" len:" + strconv.Itoa(len(t.slice)) + " height:" + strconv.Itoa(t.a.height))
 }
 
+// DrawEditView draws the edit view on the terminal.
 func (t *EntriesTab) drawEditView() {
 	t.a.drawString(0, 1, "{b}*───( Editing Entry )───")
 	t.a.drawString(0, 2, "{b}│ {C}e. {d}Return to the entry list.")
@@ -315,6 +324,7 @@ func (t *EntriesTab) drawEditView() {
 	}
 }
 
+// DrawTagView draws the tag view on the terminal.
 func (t *EntriesTab) drawTagView() {
 	t.a.drawString(0, 1, "{b}*───( Tagging Entry )───")
 	t.a.drawString(0, 2, "{b}│ {C}q. {d}Cancel tagging.")
@@ -335,6 +345,7 @@ func (t *EntriesTab) drawTagView() {
 	t.a.drawString(0, len(t.search)+4, "{b}*───*")
 }
 
+// DrawEntries draws all the entries of the view on the terminal.
 func (t *EntriesTab) drawEntries() {
 	for j := 0; j < t.a.height-3; j++ {
 		if j < len(t.slice) {
@@ -390,6 +401,7 @@ func (t *EntriesTab) drawEntries() {
 	termbox.SetCell(1, t.cursor-t.offset+1, '*', colors['d'], colors['d'])
 }
 
+// Draw calls the correct drawing function depending on the view.
 func (t *EntriesTab) Draw() {
 	if t.view == "edit" {
 		t.drawEditView()
@@ -400,6 +412,7 @@ func (t *EntriesTab) Draw() {
 	}
 }
 
+// AppendEntry adds a new entry to the list of entries and moves the cursor to it.
 func (t *EntriesTab) appendEntry(e Entry) {
 	*t.entries = append(*t.entries, e)
 	t.a.d.save()
@@ -415,6 +428,7 @@ func (t *EntriesTab) appendEntry(e Entry) {
 	}
 }
 
+// EditCurrentEntry changes the value of one of the current entry's data.
 func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 	switch field {
 	case 't':
@@ -433,6 +447,7 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 	t.a.inputActive = false
 }
 
+// Query processes the user input and calls the correct function.
 func (t *EntriesTab) Query(query string) {
 	if query[0] == ':' {
 		t.editCurrentEntry(rune(query[1]), query[3:])
@@ -454,8 +469,10 @@ func (t *EntriesTab) Query(query string) {
 	}
 }
 
+// By is the helper type used to sort entries.
 type By func(e1, e2 *Entry) bool
 
+// Sort creates an EntrySorter and sorts the entries.
 func (by By) Sort(entries []*Entry) {
 	es := &entrySorter{
 		entries: entries,
@@ -464,23 +481,29 @@ func (by By) Sort(entries []*Entry) {
 	sort.Sort(es)
 }
 
+// EntrySorter is the structure that contains the entries to be sorted and the function
+// used to sort them.
 type entrySorter struct {
 	entries []*Entry
 	by      func(e1, e2 *Entry) bool
 }
 
+// Len returns the length of a slice of entries.
 func (s *entrySorter) Len() int {
 	return len(s.entries)
 }
 
+// Swap changes the position of two different entries in a slice.
 func (s *entrySorter) Swap(i, j int) {
 	s.entries[i], s.entries[j] = s.entries[j], s.entries[i]
 }
 
+// Less returns if an entry is lesser than another entry.
 func (s *entrySorter) Less(i, j int) bool {
 	return s.by(s.entries[i], s.entries[j])
 }
 
+// Sort takes a slice and sorts it according to the sort option toggled.
 func (t *EntriesTab) sort() {
 
 	title := func(e1, e2 *Entry) bool {
@@ -513,6 +536,7 @@ func (t *EntriesTab) sort() {
 		" entries) sorted by " + t.sortField
 }
 
+// RefreshSlice sorts the current slice of entries according to which sort is toggled.
 func (t *EntriesTab) refreshSlice() {
 	t.slice = t.slice[:0]
 	for i := range *t.entries {

@@ -10,6 +10,7 @@ import (
 	"unicode"
 )
 
+// Colors is a map of all the colors available through termbox.
 var colors map[rune]termbox.Attribute = map[rune]termbox.Attribute{
 	'd': termbox.ColorDefault,
 	'k': termbox.ColorBlack, 'K': termbox.ColorBlack | termbox.AttrBold,
@@ -22,6 +23,7 @@ var colors map[rune]termbox.Attribute = map[rune]termbox.Attribute{
 	'w': termbox.ColorWhite, 'W': termbox.ColorWhite | termbox.AttrBold,
 }
 
+// Tabber is an interface used by the different tabs.
 type Tabber interface {
 	Name() string
 	Status() string
@@ -30,6 +32,7 @@ type Tabber interface {
 	Query(string)
 }
 
+// Apollo is the main object of the application.
 type Apollo struct {
 	running     bool
 	width       int
@@ -44,6 +47,8 @@ type Apollo struct {
 	inputActive bool
 }
 
+// NewApollo creates a new Apollo, initializing a new Configuration and new Database in the process.
+// It opens the default tabs and then returns itself.
 func newApollo() *Apollo {
 	err := os.Mkdir(os.Getenv("HOME")+"/.config/apollo", 0755)
 	if err != nil {
@@ -76,6 +81,8 @@ func newApollo() *Apollo {
 	return a
 }
 
+// HandleEvent changes the size of the terminal if it's been resized. On all other types of events,
+// it sends them to the key handler. It returns in case of an error.
 func (a *Apollo) handleEvent(ev *termbox.Event) error {
 	switch ev.Type {
 	case termbox.EventKey:
@@ -89,6 +96,9 @@ func (a *Apollo) handleEvent(ev *termbox.Event) error {
 	return nil
 }
 
+// HandleKeyEvent handles the current key event. It will handle events related to the input bar
+// and the changes of current tab. If none of those happens, it'll forward the event to the
+// current tab's event handler.
 func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 	if ev.Mod == termbox.ModAlt {
 		indexes := map[rune]int{'1': 1, '2': 2, '3': 3,
@@ -155,6 +165,7 @@ func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 	}
 }
 
+// DrawString draws a given string on a given row.
 func (a *Apollo) drawString(x, y int, str string) {
 	fg := colors['d']
 	runes := []rune(str)
@@ -168,6 +179,7 @@ func (a *Apollo) drawString(x, y int, str string) {
 	}
 }
 
+// DrawStatusBars draws the background color of the two status rows.
 func (a *Apollo) drawStatusBars() {
 	for i := 0; i < a.width; i++ {
 		termbox.SetCell(i, 0, ' ', colors['d'], colors['k'])
@@ -175,6 +187,7 @@ func (a *Apollo) drawStatusBars() {
 	}
 }
 
+// DrawTopStatus draws the top status row.
 func (a *Apollo) drawTopStatus() {
 	runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
 	for i := 0; i < len(runes); i++ {
@@ -182,6 +195,7 @@ func (a *Apollo) drawTopStatus() {
 	}
 }
 
+// DrawBottomStatus draws the tab status row of the terminal.
 func (a *Apollo) drawBottomStatus() {
 	var str string
 	for i := range a.tabs {
@@ -208,6 +222,7 @@ func (a *Apollo) drawBottomStatus() {
 	}
 }
 
+// DrawInput draws the input row of the terminal.
 func (a *Apollo) drawInput() {
 	if len(a.input) < a.width {
 		for i := 0; i < len(a.input); i++ {
@@ -227,6 +242,7 @@ func (a *Apollo) drawInput() {
 	}
 }
 
+// Draw calls the different drawing functions for the terminal.
 func (a *Apollo) draw() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
@@ -240,21 +256,25 @@ func (a *Apollo) draw() {
 	termbox.Flush()
 }
 
+// Log prints a message to the logs.
 func (a *Apollo) log(str string) {
 	a.tabs[0].Query(str)
 }
 
+// LogError prints a message to the logs and stderr.
 func (a *Apollo) logError(str string) {
 	a.log("{r}│ ERROR: {d}" + str)
 	log.Print(str)
 }
 
+// LogDebug logs the given string if the debug flag is on.
 func (a *Apollo) logDebug(str string) {
 	if a.c.get("debug") == "true" {
 		log.Print(str)
 	}
 }
 
+// OpenTab opens the given tab, if it's not already opened. If it is, it'll switch to it.
 func (a *Apollo) openTab(name string) error {
 	for i := range a.tabs {
 		if a.tabs[i].Name() == name {
@@ -282,6 +302,7 @@ func (a *Apollo) openTab(name string) error {
 	return nil
 }
 
+// CloseCurrentTab closes the tab currently being viewed, with the exception of the logs tab.
 func (a *Apollo) closeCurrentTab() error {
 	if a.tabs[a.currentTab].Name() == "(status)" {
 		return errors.New("term: cannot close status tab")
