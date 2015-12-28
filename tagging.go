@@ -91,10 +91,10 @@ func (t *EntriesTab) fetchOMDBTags(body *[]byte) {
 // FetchHummingbirdTags calls the API to lookup a search on the current title entry. It then saves the results.
 func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
 	type HummingbirdEntry struct {
-		Id             int
-		Title          string
-		Episode_count  int
-		Started_airing string
+		Id             *int
+		Title          *string
+		Episode_count  *int
+		Started_airing *string
 	}
 
 	var data []HummingbirdEntry
@@ -105,17 +105,17 @@ func (t *EntriesTab) fetchHummingbirdTags(body *[]byte) {
 	}
 
 	for i := 0; i < len(data); i++ {
-		if i < 10 {
-			releaseDate := strings.Split(data[i].Started_airing, "-")
+		if i < 10 && data[i].Started_airing != nil && data[i].Title != nil {
+			releaseDate := strings.Split(*data[i].Started_airing, "-")
 			episodeDone := 0
 			if t.view == "passive" {
-				episodeDone = data[i].Episode_count
+				episodeDone = *data[i].Episode_count
 			}
 			t.search = append(t.search, Entry{
-				Title:        data[i].Title,
-				TagID:        strconv.Itoa(data[i].Id),
+				Title:        *data[i].Title,
+				TagID:        strconv.Itoa(*data[i].Id),
 				Year:         releaseDate[0],
-				EpisodeTotal: data[i].Episode_count,
+				EpisodeTotal: *data[i].Episode_count,
 				EpisodeDone:  episodeDone,
 				State:        t.entryState(),
 			})
