@@ -45,6 +45,8 @@ func (a *Apollo) handleCommand() {
 		}
 	case "/config":
 		a.printConfig()
+	case "/stats":
+		a.printStats()
 	default:
 		a.logError("term: invalid command")
 	}

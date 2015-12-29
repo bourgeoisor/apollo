@@ -264,7 +264,7 @@ func (a *Apollo) log(str string) {
 // LogError prints a message to the logs and stderr.
 func (a *Apollo) logError(str string) {
 	a.log("{r}│ ERROR: {d}" + str)
-	log.Print(str)
+	//log.Print(str)
 }
 
 // LogDebug logs the given string if the debug flag is on.

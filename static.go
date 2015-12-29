@@ -1,5 +1,7 @@
 package main
 
+import "strconv"
+
 // Version is the version number of the application.
 const version = "Apollo v.0.3.5"
 
@@ -20,6 +22,7 @@ func (a *Apollo) printHelp() {
 		"{b}│ {d}/close.........Close the current tab",
 		"{b}│ {d}/set...........Set a configuration option",
 		"{b}│ {d}/config........Show the current configuration",
+		"{b}│ {d}/stats.........Prints some stats about the entries",
 		"{b}*───*",
 	}
 
@@ -83,6 +86,14 @@ func (a *Apollo) printDetailedHelp(subject string) {
 			"{b}│ {d}Shows the configuration options and their values.",
 			"{b}*───*",
 		}
+	case "stats":
+		s = []string{
+			"{b}*───( Detailed Help Guide )───*",
+			"{b}│ {d}/stats",
+			"{b}│",
+			"{b}│ {d}Prints statistics about the database entries.",
+			"{b}*───*",
+		}
 	case "tabs":
 		s = []string{
 			"{b}*───( Detailed Help Guide )───*",
@@ -127,5 +138,67 @@ func (a *Apollo) printConfig() {
 	for _, value := range a.c.config() {
 		a.log("{b}│ {d}" + value)
 	}
+	a.log("{b}*───*")
+}
+
+// PrintStats prints out relevant statistics about the database.
+func (a *Apollo) printStats() {
+	totalMovies := 0
+	watchedMovies := 0
+	for i := range a.d.Movies {
+		totalMovies++
+		if a.d.Movies[i].State == "passive" {
+			watchedMovies++
+		}
+	}
+
+	totalAnime := 0
+	watchedAnime := 0
+	totalAnimeEp := 0
+	watchedAnimeEp := 0
+	for i := range a.d.Anime {
+		totalAnime++
+		if a.d.Anime[i].State == "passive" {
+			watchedAnime++
+		}
+		totalAnimeEp += a.d.Anime[i].EpisodeTotal
+		watchedAnimeEp += a.d.Anime[i].EpisodeDone
+	}
+
+	totalGames := 0
+	playedGames := 0
+	for i := range a.d.Games {
+		totalGames++
+		if a.d.Games[i].State == "passive" {
+			playedGames++
+		}
+	}
+
+	totalBooks := 0
+	readBooks := 0
+	for i := range a.d.Books {
+		totalBooks++
+		if a.d.Books[i].State == "passive" {
+			readBooks++
+		}
+	}
+
+	sTotalMovies := strconv.Itoa(totalMovies)
+	sWatchedMovies := strconv.Itoa(watchedMovies)
+	sTotalAnime := strconv.Itoa(totalAnime)
+	sWatchedAnime := strconv.Itoa(watchedAnime)
+	sTotalAnimeEp := strconv.Itoa(totalAnimeEp)
+	sWatchedAnimeEp := strconv.Itoa(watchedAnimeEp)
+	sTotalGames := strconv.Itoa(totalGames)
+	sPlayedGames := strconv.Itoa(playedGames)
+	sTotalBooks := strconv.Itoa(totalBooks)
+	sReadBooks := strconv.Itoa(readBooks)
+
+	a.log("{b}*───( Statistics )───*")
+	a.log("{b}│ {d}Movies watched: " + sWatchedMovies + "/" + sTotalMovies)
+	a.log("{b}│ {d}Anime seasons watched: " + sWatchedAnime + "/" + sTotalAnime)
+	a.log("{b}│ {d} Episodes watched: " + sWatchedAnimeEp + "/" + sTotalAnimeEp)
+	a.log("{b}│ {d}Games played: " + sPlayedGames + "/" + sTotalGames)
+	a.log("{b}│ {d}Books read: " + sReadBooks + "/" + sTotalBooks)
 	a.log("{b}*───*")
 }
