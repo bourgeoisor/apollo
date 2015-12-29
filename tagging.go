@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"encoding/xml"
 	"io/ioutil"
@@ -21,7 +22,12 @@ func (t *EntriesTab) fetchTags() {
 	url := strings.Replace(urls[t.taggingAPI], "{TITLE}", title, 1)
 	t.a.logDebug(url)
 
-	res, err := http.Get(url)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	res, err := client.Get(url)
 	if err != nil {
 		t.a.logError(err.Error())
 		return
