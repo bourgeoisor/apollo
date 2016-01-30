@@ -128,7 +128,7 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 	if t.view == "edit" {
 		switch ev.Ch {
 		case 'e':
-			t.view = "passive"
+			t.view = t.pastView
 			t.refreshSlice()
 		case '0':
 			t.a.inputActive = true
@@ -204,10 +204,13 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			}
 		case 'e':
 			if len(t.slice) > 0 {
+				t.pastView = t.view
 				t.view = "edit"
 			}
 		case 't':
-			t.fetchTags()
+			if len(t.slice) > 0 {
+				t.fetchTags()
+			}
 		case 'r':
 			t.ratings = !t.ratings
 		case 'a':
@@ -251,8 +254,10 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 				if t.slice[t.cursor].EpisodeDone < t.slice[t.cursor].EpisodeTotal {
 					t.slice[t.cursor].EpisodeDone++
 					t.slice[t.cursor].State = "active"
-				} else {
-					t.slice[t.cursor].State = "passive"
+					if t.slice[t.cursor].EpisodeDone == t.slice[t.cursor].EpisodeTotal {
+						t.slice[t.cursor].Rating = 0
+						t.slice[t.cursor].State = "passive"
+					}
 				}
 				t.a.d.save()
 			}
