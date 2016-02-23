@@ -7,7 +7,7 @@ but I have since decided to put it out there on Github for all to enjoy.
 Screenshot
 ----------
 
-![ScreenShot](https://cloud.githubusercontent.com/assets/3271352/11099708/4c142eb0-8883-11e5-923f-4e28d7b7b76e.png)
+![ScreenShot](https://cloud.githubusercontent.com/assets/3271352/13240413/c46ba128-d9b8-11e5-8dae-3f2021383822.png)
 
 Features
 --------
