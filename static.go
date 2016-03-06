@@ -3,7 +3,7 @@ package main
 import "strconv"
 
 // Version is the version number of the application.
-const version = "Apollo v.0.3.5"
+const version = "Apollo v1.0.0"
 
 // PrintHelp prints out the help guide to the logs.
 func (a *Apollo) printHelp() {
@@ -127,8 +127,8 @@ func (a *Apollo) printDetailedHelp(subject string) {
 // PrintWelcome prints out the welcome message to the logs.
 func (a *Apollo) printWelcome() {
 	a.log("{b}*───( " + version + " )───*")
-	a.log("{b}│ {d}This software is under heavy developpment and may contain bugs and glitches.")
-	a.log("{b}│ {d}Use at your own risk. To get started, use /help.")
+	a.log("{b}│ {d}This software is licensed under the MIT License.")
+	a.log("{b}│ {d}To get started, use /help.")
 	a.log("{b}*───*")
 }
 

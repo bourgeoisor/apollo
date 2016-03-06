@@ -2,7 +2,7 @@
 
 Apollo is a handy console-based way of organizing all of your media titles and keeping track of 
 what you are currently watching, reading, and playing. It started out as a project for my own usage,
-but I have since decided to put it out there on Github for all to enjoy.
+but I have since decided to put it out there on GitHub for all to enjoy.
 
 Screenshot
 ----------
@@ -74,10 +74,9 @@ in `~/.config/apollo/`.
 Development State
 -----------------
 
-All in all, Apollo as a CLI application is basically done, minus some little features that I might want
-to implement later on. That being said, if someone were to want to contribute to this project, please 
-feel free to either message me for more information or to directly send in a pull request. The next
-step for Apollo will be to port the application as an Android and possibly iOS application.
+Apollo is now completely fulfilling my needs. That being said, if someone were to want to 
+contribute to this project, please feel free to either message me for more information or 
+to directly send in a pull request.
 
 APIs Used
 ---------
