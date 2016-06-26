@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/nsf/termbox-go"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -50,11 +49,6 @@ type Apollo struct {
 // NewApollo creates a new Apollo, initializing a new Configuration and new Database in the process.
 // It opens the default tabs and then returns itself.
 func newApollo() *Apollo {
-	err := os.Mkdir(os.Getenv("HOME")+"/.config/apollo", 0755)
-	if err != nil {
-		log.Print(err)
-	}
-
 	width, height := termbox.Size()
 	var tabs []Tabber
 

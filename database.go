@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"os"
 )
 
 // Entry is a single media title.
@@ -40,7 +39,7 @@ func newDatabase() *Database {
 
 // Load fetches the user's database from a file.
 func (d *Database) load() {
-	path := os.Getenv("HOME") + "/.config/apollo/database.json"
+	path := databasePath()
 	cont, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
@@ -59,7 +58,7 @@ func (d *Database) save() {
 		log.Fatal(err)
 	}
 
-	path := os.Getenv("HOME") + "/.config/apollo/database.json"
+	path := databasePath()
 	err = ioutil.WriteFile(path, cont, 0644)
 	if err != nil {
 		log.Print(err)

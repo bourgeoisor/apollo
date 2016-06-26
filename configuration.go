@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
-	"os"
 )
 
 // Configuration is a map of all the configuration values.
@@ -34,7 +33,7 @@ func newConfiguration() *Configuration {
 
 // Load fetches the user's configuration options from a file.
 func (c *Configuration) load() {
-	path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
+	path := configurationPath()
 	cont, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
@@ -60,7 +59,7 @@ func (c *Configuration) save() {
 		log.Fatal(err)
 	}
 
-	path := os.Getenv("HOME") + "/.config/apollo/configuration.json"
+	path := configurationPath()
 	err = ioutil.WriteFile(path, cont, 0644)
 	if err != nil {
 		log.Print(err)
