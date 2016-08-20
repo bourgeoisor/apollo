@@ -12,9 +12,13 @@ const version = "Apollo v1.0.0"
 
 // Create a configuration directory for Unis systems.
 func makeUnixConfigDir() {
-	err := os.Mkdir(os.Getenv("HOME")+"/.config/apollo", 0755)
+	path := os.Getenv("HOME") + "/.config/apollo"
+	_, err := os.Stat(path)
 	if err != nil {
-		log.Print(err)
+		err = os.Mkdir(path, 0755)
+		if err != nil {
+			log.Print(err)
+		}
 	}
 }
 
