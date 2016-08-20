@@ -1,10 +1,10 @@
 package main
 
 import (
-  "strconv"
-  "runtime"
-  "os"
-  "log"
+	"log"
+	"os"
+	"runtime"
+	"strconv"
 )
 
 // Version is the version number of the application.
@@ -12,7 +12,7 @@ const version = "Apollo v1.0.0"
 
 // Create a configuration directory for Unis systems.
 func makeUnixConfigDir() {
-  err := os.Mkdir(os.Getenv("HOME")+"/.config/apollo", 0755)
+	err := os.Mkdir(os.Getenv("HOME")+"/.config/apollo", 0755)
 	if err != nil {
 		log.Print(err)
 	}
@@ -20,22 +20,22 @@ func makeUnixConfigDir() {
 
 // Returns the path of the database file.
 func databasePath() string {
-  if runtime.GOOS == "windows" {
-    return "database.json"
-  } else {
-    makeUnixConfigDir()
-    return os.Getenv("HOME") + "/.config/apollo/database.json"
-  }
+	if runtime.GOOS == "windows" {
+		return "database.json"
+	} else {
+		makeUnixConfigDir()
+		return os.Getenv("HOME") + "/.config/apollo/database.json"
+	}
 }
 
 // Returns the path of the configuration file.
 func configurationPath() string {
-  if runtime.GOOS == "windows" {
-    return "configuration.json"
-  } else {
-    makeUnixConfigDir()
-    return os.Getenv("HOME") + "/.config/apollo/configuration.json"
-  }
+	if runtime.GOOS == "windows" {
+		return "configuration.json"
+	} else {
+		makeUnixConfigDir()
+		return os.Getenv("HOME") + "/.config/apollo/configuration.json"
+	}
 }
 
 // PrintHelp prints out the help guide to the logs.
