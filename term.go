@@ -176,8 +176,8 @@ func (a *Apollo) drawString(x, y int, str string) {
 // DrawStatusBars draws the background color of the two status rows.
 func (a *Apollo) drawStatusBars() {
 	for i := 0; i < a.width; i++ {
-		termbox.SetCell(i, 0, ' ', colors['d'], colors['k'])
-		termbox.SetCell(i, a.height-2, ' ', colors['d'], colors['k'])
+		termbox.SetCell(i, 0, ' ', colors['d'], colors['b'])
+		termbox.SetCell(i, a.height-2, ' ', colors['d'], colors['b'])
 	}
 }
 
@@ -185,7 +185,7 @@ func (a *Apollo) drawStatusBars() {
 func (a *Apollo) drawTopStatus() {
 	runes := []rune(version + " - " + a.tabs[a.currentTab].Status())
 	for i := 0; i < len(runes); i++ {
-		termbox.SetCell(i, 0, runes[i], colors['W'], colors['k'])
+		termbox.SetCell(i, 0, runes[i], colors['W'], colors['b'])
 	}
 }
 
@@ -211,7 +211,7 @@ func (a *Apollo) drawBottomStatus() {
 			fg = colors['w']
 			i++
 		}
-		termbox.SetCell(x, a.height-2, runes[i], fg, colors['k'])
+		termbox.SetCell(x, a.height-2, runes[i], fg, colors['b'])
 		x++
 	}
 }

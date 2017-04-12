@@ -358,7 +358,7 @@ func (t *EntriesTab) drawEntries() {
 			if t.ratings && t.view != "active" {
 				for i := 0; i < t.slice[j+t.offset].Rating; i++ {
 					if t.slice[j+t.offset].State == "passive" {
-						termbox.SetCell(i+3, j+1, '*', colors['y'], colors['d'])
+						termbox.SetCell(i+3, j+1, '*', colors['G'], colors['d'])
 					} else if t.slice[j+t.offset].State == "inactive" {
 						termbox.SetCell(i+3, j+1, '*', colors['B'], colors['d'])
 					}
@@ -372,11 +372,11 @@ func (t *EntriesTab) drawEntries() {
 			}
 			switch t.slice[j+t.offset].State {
 			case "passive":
-				year = "{g}" + year + "{d}"
+				year = "{G}" + year + "{d}"
 			case "active":
 				year = "{Y}" + year + "{d}"
 			case "inactive":
-				year = "{b}" + year + "{d}"
+				year = "{B}" + year + "{d}"
 			}
 			title := t.slice[j+t.offset].Title
 
