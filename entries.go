@@ -358,9 +358,9 @@ func (t *EntriesTab) drawEntries() {
 			if t.ratings && t.view != "active" {
 				for i := 0; i < t.slice[j+t.offset].Rating; i++ {
 					if t.slice[j+t.offset].State == "passive" {
-						termbox.SetCell(i+3, j+1, '*', colors['G'], colors['d'])
+						termbox.SetCell(i+3, j+1, '*', colors['g'], colors['d'])
 					} else if t.slice[j+t.offset].State == "inactive" {
-						termbox.SetCell(i+3, j+1, '*', colors['B'], colors['d'])
+						termbox.SetCell(i+3, j+1, '*', colors['b'], colors['d'])
 					}
 				}
 				i = 10
@@ -372,18 +372,18 @@ func (t *EntriesTab) drawEntries() {
 			}
 			switch t.slice[j+t.offset].State {
 			case "passive":
-				year = "{G}" + year + "{d}"
+				year = "{g}" + year + "{d}"
 			case "active":
-				year = "{Y}" + year + "{d}"
+				year = "{y}" + year + "{d}"
 			case "inactive":
-				year = "{B}" + year + "{d}"
+				year = "{b}" + year + "{d}"
 			}
 			title := t.slice[j+t.offset].Title
 
 			var str string
 			if t.entryType == "additional" {
 				info := t.slice[j+t.offset].Info1
-				str = year + " " + title + " [{B}" + info + "{d}]"
+				str = year + " " + title + " [{b}" + info + "{d}]"
 			} else if t.entryType == "episodic" {
 				episodeDone := strconv.Itoa(t.slice[j+t.offset].EpisodeDone)
 				if len(episodeDone) == 1 {
@@ -393,7 +393,7 @@ func (t *EntriesTab) drawEntries() {
 				if len(episodeTotal) == 1 {
 					episodeTotal = "0" + episodeTotal
 				}
-				episodes := "[{B}" + episodeDone + "{d}/{b}" + episodeTotal + "{d}]"
+				episodes := "[{b}" + episodeDone + "{d}/{b}" + episodeTotal + "{d}]"
 				str = episodes + " " + year + " " + title
 			} else if t.entryType == "default" {
 				str = year + " " + title
