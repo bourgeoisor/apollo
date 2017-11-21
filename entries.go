@@ -129,6 +129,7 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 		switch ev.Ch {
 		case 'e':
 			t.view = t.pastView
+			t.a.d.save()
 			t.refreshSlice()
 		case '0':
 			t.a.inputActive = true
