@@ -429,6 +429,8 @@ func (t *EntriesTab) appendEntry(e Entry) {
 			t.cursor = i
 			if t.cursor > t.a.height-4 {
 				t.offset = t.cursor - (t.a.height - 4)
+			} else {
+				t.offset = 0
 			}
 		}
 	}
