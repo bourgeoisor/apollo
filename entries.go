@@ -103,10 +103,14 @@ func (t *EntriesTab) printEntriesToFile() {
 			episodeDone := strconv.Itoa(t.slice[j].EpisodeDone)
 			if len(episodeDone) == 1 {
 				episodeDone = "0" + episodeDone
+			} else if len(episodeDone) == 2 {
+				episodeDone = "00" + episodeDone
 			}
 			episodeTotal := strconv.Itoa(t.slice[j].EpisodeTotal)
 			if len(episodeTotal) == 1 {
 				episodeTotal = "0" + episodeTotal
+			} else if len(episodeTotal) == 2 {
+				episodeTotal = "00" + episodeTotal
 			}
 			episodes := "[" + episodeDone + "/" + episodeTotal + "]"
 			str = episodes + " " + year + " " + title
@@ -388,14 +392,24 @@ func (t *EntriesTab) drawEntries() {
 				str = year + " " + title + " [{b}" + info + "{d}]"
 			} else if t.entryType == "episodic" {
 				episodeDone := strconv.Itoa(t.slice[j+t.offset].EpisodeDone)
-				if len(episodeDone) == 1 {
-					episodeDone = "0" + episodeDone
+				if episodeDone == "0" {
+					episodeDone = "{k}000"
+				} else if len(episodeDone) == 1 {
+					episodeDone = "{k}00{b}" + episodeDone
+				} else if len(episodeDone) == 2 {
+					episodeDone = "{k}0{b}" + episodeDone
+				} else if len(episodeDone) == 3 {
+					episodeDone = "{b}" + episodeDone
 				}
 				episodeTotal := strconv.Itoa(t.slice[j+t.offset].EpisodeTotal)
 				if len(episodeTotal) == 1 {
-					episodeTotal = "0" + episodeTotal
+					episodeTotal = "{k}00{b}" + episodeTotal
+				} else if len(episodeTotal) == 2 {
+					episodeTotal = "{k}0{b}" + episodeTotal
+				} else if len(episodeTotal) == 3 {
+					episodeTotal = "{b}" + episodeTotal
 				}
-				episodes := "[{b}" + episodeDone + "{d}/{b}" + episodeTotal + "{d}]"
+				episodes := "[" + episodeDone + "{d}/" + episodeTotal + "{d}]"
 				str = episodes + " " + year + " " + title
 			} else if t.entryType == "default" {
 				str = year + " " + title
