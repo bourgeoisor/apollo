@@ -6,6 +6,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // EntriesTab is a tab for displaying entries implementing Tabber.
@@ -515,7 +516,7 @@ func (s *entrySorter) Less(i, j int) bool {
 func (t *EntriesTab) sort() {
 
 	title := func(e1, e2 *Entry) bool {
-		return e1.Title < e2.Title
+		return strings.ToLower(e1.Title) < strings.ToLower(e2.Title)
 	}
 
 	year := func(e1, e2 *Entry) bool {
