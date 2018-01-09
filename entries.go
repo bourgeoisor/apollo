@@ -257,7 +257,8 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			}
 		case 'v':
 			if len(t.slice) > 0 && t.entryType == "episodic" {
-				if t.slice[t.cursor].EpisodeDone < t.slice[t.cursor].EpisodeTotal {
+				if t.slice[t.cursor].EpisodeDone < t.slice[t.cursor].EpisodeTotal ||
+					t.slice[t.cursor].EpisodeTotal == 0 {
 					t.slice[t.cursor].EpisodeDone++
 					t.slice[t.cursor].State = "active"
 					if t.slice[t.cursor].EpisodeDone == t.slice[t.cursor].EpisodeTotal {
@@ -402,7 +403,9 @@ func (t *EntriesTab) drawEntries() {
 					episodeDone = "{b}" + episodeDone
 				}
 				episodeTotal := strconv.Itoa(t.slice[j+t.offset].EpisodeTotal)
-				if len(episodeTotal) == 1 {
+				if episodeTotal == "0" {
+					episodeTotal = "{k}???"
+				} else if len(episodeTotal) == 1 {
 					episodeTotal = "{k}00{b}" + episodeTotal
 				} else if len(episodeTotal) == 2 {
 					episodeTotal = "{k}0{b}" + episodeTotal
