@@ -13,6 +13,7 @@ type Entry struct {
 	Year         string
 	TagID        string
 	Rating       int
+	Future       string
 	Info1        string
 	EpisodeDone  int
 	EpisodeTotal int

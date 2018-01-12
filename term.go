@@ -11,7 +11,7 @@ import (
 
 // Colors is a map of all the colors available through termbox.
 var colors map[rune]termbox.Attribute = map[rune]termbox.Attribute{
-	'd': termbox.ColorDefault,
+	'd': termbox.ColorDefault, 'D': termbox.ColorDefault | termbox.AttrBold,
 	'k': termbox.ColorBlack, 'K': termbox.ColorBlack | termbox.AttrBold,
 	'r': termbox.ColorRed, 'R': termbox.ColorRed | termbox.AttrBold,
 	'g': termbox.ColorGreen, 'G': termbox.ColorGreen | termbox.AttrBold,
@@ -171,6 +171,20 @@ func (a *Apollo) drawString(x, y int, str string) {
 		termbox.SetCell(x, y, runes[i], fg, colors['d'])
 		x++
 	}
+}
+
+// DrawStringRightAlign draws a string aligned to the right.
+func (a *Apollo) drawStringRightAlign(x, y int, str string) {
+	strLen := 0
+	runes := []rune(str)
+	for i := 0; i < len(runes); i++ {
+		if runes[i] == '{' {
+			i += 2
+		} else {
+			strLen++
+		}
+	}
+	a.drawString(x-strLen, y, str)
 }
 
 // DrawStatusBars draws the background color of the two status rows.

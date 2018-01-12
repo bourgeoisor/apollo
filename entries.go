@@ -145,6 +145,10 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			t.a.input = []rune(":y " + t.slice[t.cursor].Year)
 			t.a.inputCursor = len(t.a.input)
 		case '2':
+			t.a.inputActive = true
+			t.a.input = []rune(":f " + t.slice[t.cursor].Future)
+			t.a.inputCursor = len(t.a.input)
+		case '3':
 			if t.entryType == "additional" {
 				t.a.inputActive = true
 				t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
@@ -325,14 +329,15 @@ func (t *EntriesTab) drawEditView() {
 	t.a.drawString(0, 3, "{b}│")
 	t.a.drawString(0, 4, "{b}│ {C}0. {d}[{B}Title{d}]    "+t.slice[t.cursor].Title)
 	t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Year{d}]     "+t.slice[t.cursor].Year)
+	t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Future{d}]   "+t.slice[t.cursor].Future)
 	if t.entryType == "additional" {
-		t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info1)
-		t.a.drawString(0, 7, "{b}*───*")
+		t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info1)
+		t.a.drawString(0, 8, "{b}*───*")
 	} else if t.entryType == "episodic" {
-		t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
-		t.a.drawString(0, 7, "{b}*───*")
+		t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
+		t.a.drawString(0, 8, "{b}*───*")
 	} else {
-		t.a.drawString(0, 6, "{b}*───*")
+		t.a.drawString(0, 7, "{b}*───*")
 	}
 }
 
@@ -373,17 +378,22 @@ func (t *EntriesTab) drawEntries() {
 				i = 10
 			}
 
+			colorMod := "{d}"
+			if t.slice[j+t.offset].Future != "" {
+				colorMod = "{D}"
+			}
+
 			year := t.slice[j+t.offset].Year
 			if year == "" {
 				year = "----"
 			}
 			switch t.slice[j+t.offset].State {
 			case "passive":
-				year = "{g}" + year + "{d}"
+				year = "{g}" + year + colorMod
 			case "active":
-				year = "{y}" + year + "{d}"
+				year = "{y}" + year + colorMod
 			case "inactive":
-				year = "{b}" + year + "{d}"
+				year = "{b}" + year + colorMod
 			}
 			title := t.slice[j+t.offset].Title
 
@@ -419,6 +429,11 @@ func (t *EntriesTab) drawEntries() {
 			}
 
 			t.a.drawString(i, j+1, str)
+
+			if t.slice[j+t.offset].Future != "" {
+				futureStr := "{D}(" + t.slice[j+t.offset].Future + ")"
+				t.a.drawStringRightAlign(t.a.width, j+1, futureStr)
+			}
 		}
 	}
 
@@ -461,6 +476,8 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 		t.slice[t.cursor].Title = value
 	case 'y':
 		t.slice[t.cursor].Year = value
+	case 'f':
+		t.slice[t.cursor].Future = value
 	case 'e':
 		episodeTotal, err := strconv.Atoi(value)
 		if err == nil {
