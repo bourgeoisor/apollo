@@ -3,14 +3,13 @@ package main
 import (
 	"errors"
 	"github.com/nsf/termbox-go"
-	"log"
 	"strconv"
 	"strings"
 	"unicode"
 )
 
 // Colors is a map of all the colors available through termbox.
-var colors map[rune]termbox.Attribute = map[rune]termbox.Attribute{
+var colors = map[rune]termbox.Attribute{
 	'd': termbox.ColorDefault, 'D': termbox.ColorDefault | termbox.AttrBold,
 	'k': termbox.ColorBlack, 'K': termbox.ColorBlack | termbox.AttrBold,
 	'r': termbox.ColorRed, 'R': termbox.ColorRed | termbox.AttrBold,
@@ -95,12 +94,10 @@ func (a *Apollo) handleEvent(ev *termbox.Event) error {
 // current tab's event handler.
 func (a *Apollo) handleKeyEvent(ev *termbox.Event) {
 	if ev.Mod == termbox.ModAlt {
-		indexes := map[rune]int{'1': 1, '2': 2, '3': 3,
-			'4': 4, '5': 5, '6': 6,
-			'7': 7, '8': 8, '9': 9}
+		indexes := map[rune]int{'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
 		if i, exist := indexes[ev.Ch]; exist {
-			if len(a.tabs) > i-1 {
-				a.currentTab = i - 1
+			if len(a.tabs) > i {
+				a.currentTab = i
 				a.tabs[a.currentTab].Query("!focused")
 			}
 		}
@@ -208,9 +205,9 @@ func (a *Apollo) drawBottomStatus() {
 	var str string
 	for i := range a.tabs {
 		if i == a.currentTab {
-			str += "{" + strconv.Itoa(i+1) + "." + a.tabs[i].Name() + "} "
+			str += "{" + strconv.Itoa(i) + "." + a.tabs[i].Name() + "} "
 		} else {
-			str += strconv.Itoa(i+1) + "." + a.tabs[i].Name() + " "
+			str += strconv.Itoa(i) + "." + a.tabs[i].Name() + " "
 		}
 	}
 
@@ -272,13 +269,12 @@ func (a *Apollo) log(str string) {
 // LogError prints a message to the logs and stderr.
 func (a *Apollo) logError(str string) {
 	a.log("{r}│ ERROR: {d}" + str)
-	//log.Print(str)
 }
 
 // LogDebug logs the given string if the debug flag is on.
 func (a *Apollo) logDebug(str string) {
 	if a.c.get("debug") == "true" {
-		log.Print(str)
+		a.log("{y}│ DEBUG: {d}" + str)
 	}
 }
 

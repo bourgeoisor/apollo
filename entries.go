@@ -102,15 +102,15 @@ func (t *EntriesTab) printEntriesToFile() {
 		} else if t.entryType == "episodic" {
 			episodeDone := strconv.Itoa(t.slice[j].EpisodeDone)
 			if len(episodeDone) == 1 {
-				episodeDone = "0" + episodeDone
-			} else if len(episodeDone) == 2 {
 				episodeDone = "00" + episodeDone
+			} else if len(episodeDone) == 2 {
+				episodeDone = "0" + episodeDone
 			}
 			episodeTotal := strconv.Itoa(t.slice[j].EpisodeTotal)
 			if len(episodeTotal) == 1 {
-				episodeTotal = "0" + episodeTotal
-			} else if len(episodeTotal) == 2 {
 				episodeTotal = "00" + episodeTotal
+			} else if len(episodeTotal) == 2 {
+				episodeTotal = "0" + episodeTotal
 			}
 			episodes := "[" + episodeDone + "/" + episodeTotal + "]"
 			str = episodes + " " + year + " " + title
@@ -347,15 +347,17 @@ func (t *EntriesTab) drawTagView() {
 	t.a.drawString(0, 2, "{b}│ {C}q. {d}Cancel tagging.")
 	t.a.drawString(0, 3, "{b}│")
 	for j := 0; j < len(t.search); j++ {
-		year := t.search[j].Year
+			entry := t.search[j]
+
+		year := entry.Year
 		if year == "" {
 			year = "----"
 		}
-		str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + year + "{d}] " + t.search[j].Title
+		str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + year + "{d}] " + entry.Title
 		if t.entryType == "additional" {
-			str += " [" + t.search[j].Info1 + "]"
+			str += " [" + entry.Info1 + "]"
 		} else if t.entryType == "episodic" {
-			str += " [" + strconv.Itoa(t.search[j].EpisodeTotal) + "]"
+			str += " [" + strconv.Itoa(entry.EpisodeTotal) + "]"
 		}
 		t.a.drawString(0, j+4, str)
 	}
@@ -366,12 +368,14 @@ func (t *EntriesTab) drawTagView() {
 func (t *EntriesTab) drawEntries() {
 	for j := 0; j < t.a.height-3; j++ {
 		if j < len(t.slice) {
+			entry := t.slice[j+t.offset]
+
 			i := 3
 			if t.ratings && t.view != "active" {
-				for i := 0; i < t.slice[j+t.offset].Rating; i++ {
-					if t.slice[j+t.offset].State == "passive" {
+				for i := 0; i < entry.Rating; i++ {
+					if entry.State == "passive" {
 						termbox.SetCell(i+3, j+1, '*', colors['g'], colors['d'])
-					} else if t.slice[j+t.offset].State == "inactive" {
+					} else if entry.State == "inactive" {
 						termbox.SetCell(i+3, j+1, '*', colors['b'], colors['d'])
 					}
 				}
@@ -379,15 +383,15 @@ func (t *EntriesTab) drawEntries() {
 			}
 
 			colorMod := "{d}"
-			if t.slice[j+t.offset].Future != "" {
+			if entry.Future != "" {
 				colorMod = "{D}"
 			}
 
-			year := t.slice[j+t.offset].Year
+			year := entry.Year
 			if year == "" {
 				year = "----"
 			}
-			switch t.slice[j+t.offset].State {
+			switch entry.State {
 			case "passive":
 				year = "{g}" + year + colorMod
 			case "active":
@@ -395,14 +399,14 @@ func (t *EntriesTab) drawEntries() {
 			case "inactive":
 				year = "{b}" + year + colorMod
 			}
-			title := t.slice[j+t.offset].Title
+			title := entry.Title
 
 			var str string
 			if t.entryType == "additional" {
-				info := t.slice[j+t.offset].Info1
+				info := entry.Info1
 				str = year + " " + title + " [{b}" + info + "{d}]"
 			} else if t.entryType == "episodic" {
-				episodeDone := strconv.Itoa(t.slice[j+t.offset].EpisodeDone)
+				episodeDone := strconv.Itoa(entry.EpisodeDone)
 				if episodeDone == "0" {
 					episodeDone = "{k}000"
 				} else if len(episodeDone) == 1 {
@@ -412,7 +416,7 @@ func (t *EntriesTab) drawEntries() {
 				} else if len(episodeDone) == 3 {
 					episodeDone = "{b}" + episodeDone
 				}
-				episodeTotal := strconv.Itoa(t.slice[j+t.offset].EpisodeTotal)
+				episodeTotal := strconv.Itoa(entry.EpisodeTotal)
 				if episodeTotal == "0" {
 					episodeTotal = "{k}???"
 				} else if len(episodeTotal) == 1 {
@@ -430,8 +434,8 @@ func (t *EntriesTab) drawEntries() {
 
 			t.a.drawString(i, j+1, str)
 
-			if t.slice[j+t.offset].Future != "" {
-				futureStr := "{D}(" + t.slice[j+t.offset].Future + ")"
+			if entry.Future != "" {
+				futureStr := "{D}(" + entry.Future + ")"
 				t.a.drawStringRightAlign(t.a.width, j+1, futureStr)
 			}
 		}
@@ -449,6 +453,7 @@ func (t *EntriesTab) Draw() {
 	} else {
 		t.drawEntries()
 	}
+	t.a.log(strconv.Itoa(t.cursor))
 }
 
 // AppendEntry adds a new entry to the list of entries and moves the cursor to it.
