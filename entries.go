@@ -453,7 +453,6 @@ func (t *EntriesTab) Draw() {
 	} else {
 		t.drawEntries()
 	}
-	t.a.log(strconv.Itoa(t.cursor))
 }
 
 // AppendEntry adds a new entry to the list of entries and moves the cursor to it.
@@ -505,6 +504,8 @@ func (t *EntriesTab) Query(query string) {
 		t.view = "active"
 		t.refreshSlice()
 		if len(t.slice) == 0 {
+			t.cursor = 0
+			t.offset = 0
 			t.view = "passive"
 			t.refreshSlice()
 		}
@@ -555,7 +556,11 @@ func (s *entrySorter) Less(i, j int) bool {
 func (t *EntriesTab) sort() {
 
 	title := func(e1, e2 *Entry) bool {
-		return strings.ToLower(e1.Title) < strings.ToLower(e2.Title)
+		if strings.ToLower(e1.Title) == strings.ToLower(e2.Title) {
+			return e1.Year < e2.Year
+		} else {
+			return strings.ToLower(e1.Title) < strings.ToLower(e2.Title)
+		}
 	}
 
 	year := func(e1, e2 *Entry) bool {
