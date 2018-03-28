@@ -9,6 +9,7 @@ import (
 // Entry is a single media title.
 type Entry struct {
 	Title        string
+	TitleSort    string
 	State        string
 	Year         string
 	TagID        string

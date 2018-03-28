@@ -142,13 +142,17 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			t.a.inputCursor = len(t.a.input)
 		case '1':
 			t.a.inputActive = true
-			t.a.input = []rune(":y " + t.slice[t.cursor].Year)
+			t.a.input = []rune(":s " + t.slice[t.cursor].TitleSort)
 			t.a.inputCursor = len(t.a.input)
 		case '2':
 			t.a.inputActive = true
-			t.a.input = []rune(":f " + t.slice[t.cursor].Future)
+			t.a.input = []rune(":y " + t.slice[t.cursor].Year)
 			t.a.inputCursor = len(t.a.input)
 		case '3':
+			t.a.inputActive = true
+			t.a.input = []rune(":f " + t.slice[t.cursor].Future)
+			t.a.inputCursor = len(t.a.input)
+		case '4':
 			if t.entryType == "additional" {
 				t.a.inputActive = true
 				t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
@@ -328,16 +332,17 @@ func (t *EntriesTab) drawEditView() {
 	t.a.drawString(0, 2, "{b}│ {C}e. {d}Return to the entry list.")
 	t.a.drawString(0, 3, "{b}│")
 	t.a.drawString(0, 4, "{b}│ {C}0. {d}[{B}Title{d}]    "+t.slice[t.cursor].Title)
-	t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Year{d}]     "+t.slice[t.cursor].Year)
-	t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Future{d}]   "+t.slice[t.cursor].Future)
+	t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Sort{d}]     "+t.slice[t.cursor].TitleSort)
+	t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Year{d}]     "+t.slice[t.cursor].Year)
+	t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Future{d}]   "+t.slice[t.cursor].Future)
 	if t.entryType == "additional" {
-		t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info1)
-		t.a.drawString(0, 8, "{b}*───*")
+		t.a.drawString(0, 8, "{b}│ {C}4. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info1)
+		t.a.drawString(0, 9, "{b}*───*")
 	} else if t.entryType == "episodic" {
-		t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
-		t.a.drawString(0, 8, "{b}*───*")
+		t.a.drawString(0, 8, "{b}│ {C}4. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
+		t.a.drawString(0, 9, "{b}*───*")
 	} else {
-		t.a.drawString(0, 7, "{b}*───*")
+		t.a.drawString(0, 8, "{b}*───*")
 	}
 }
 
@@ -478,6 +483,8 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 	switch field {
 	case 't':
 		t.slice[t.cursor].Title = value
+	case 's':
+		t.slice[t.cursor].TitleSort = value
 	case 'y':
 		t.slice[t.cursor].Year = value
 	case 'f':
@@ -556,10 +563,20 @@ func (s *entrySorter) Less(i, j int) bool {
 func (t *EntriesTab) sort() {
 
 	title := func(e1, e2 *Entry) bool {
-		if strings.ToLower(e1.Title) == strings.ToLower(e2.Title) {
+		s1 := strings.Replace(e1.Title, "The ", "", 1)
+		if e1.TitleSort != "" {
+			s1 = strings.Replace(e1.TitleSort, "The ", "", 1)
+		}
+
+		s2 := strings.Replace(e2.Title, "The ", "", 1)
+		if e2.TitleSort != "" {
+			s2 = strings.Replace(e2.TitleSort, "The ", "", 1)
+		}
+
+		if strings.ToLower(s1) == strings.ToLower(s2) {
 			return e1.Year < e2.Year
 		} else {
-			return strings.ToLower(e1.Title) < strings.ToLower(e2.Title)
+			return strings.ToLower(s1) < strings.ToLower(s2)
 		}
 	}
 
