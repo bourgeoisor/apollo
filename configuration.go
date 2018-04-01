@@ -12,7 +12,7 @@ type Configuration struct {
 	options map[string]string
 }
 
-// NewConfiguraion creates a new Configuration with default values and returns it.
+// NewConfiguration creates a new Configuration with default values and returns it.
 func newConfiguration() *Configuration {
 	options := map[string]string{
 		"auto-tag":       "false",
