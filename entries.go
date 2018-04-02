@@ -97,7 +97,7 @@ func (t *EntriesTab) printEntriesToFile() {
 
 		var str string
 		if t.entryType == "additional" {
-			info := t.slice[j].Info1
+			info := t.slice[j].Info
 			str = year + " " + title + " [" + info + "]"
 		} else if t.entryType == "episodic" {
 			episodeDone := strconv.Itoa(t.slice[j].EpisodeDone)
@@ -146,16 +146,20 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			t.a.inputCursor = len(t.a.input)
 		case '2':
 			t.a.inputActive = true
-			t.a.input = []rune(":y " + t.slice[t.cursor].Year)
+			t.a.input = []rune(":c " + t.slice[t.cursor].Collection)
 			t.a.inputCursor = len(t.a.input)
 		case '3':
 			t.a.inputActive = true
-			t.a.input = []rune(":f " + t.slice[t.cursor].Future)
+			t.a.input = []rune(":y " + t.slice[t.cursor].Year)
 			t.a.inputCursor = len(t.a.input)
 		case '4':
+			t.a.inputActive = true
+			t.a.input = []rune(":f " + t.slice[t.cursor].Future)
+			t.a.inputCursor = len(t.a.input)
+		case '5':
 			if t.entryType == "additional" {
 				t.a.inputActive = true
-				t.a.input = []rune(":i " + t.slice[t.cursor].Info1)
+				t.a.input = []rune(":i " + t.slice[t.cursor].Info)
 				t.a.inputCursor = len(t.a.input)
 			} else if t.entryType == "episodic" {
 				t.a.inputActive = true
@@ -331,18 +335,19 @@ func (t *EntriesTab) drawEditView() {
 	t.a.drawString(0, 1, "{b}*───( Editing Entry )───")
 	t.a.drawString(0, 2, "{b}│ {C}e. {d}Return to the entry list.")
 	t.a.drawString(0, 3, "{b}│")
-	t.a.drawString(0, 4, "{b}│ {C}0. {d}[{B}Title{d}]    "+t.slice[t.cursor].Title)
-	t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Sort{d}]     "+t.slice[t.cursor].TitleSort)
-	t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Year{d}]     "+t.slice[t.cursor].Year)
-	t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Future{d}]   "+t.slice[t.cursor].Future)
+	t.a.drawString(0, 4, "{b}│ {C}0. {d}[{B}Title{d}]       "+t.slice[t.cursor].Title)
+	t.a.drawString(0, 5, "{b}│ {C}1. {d}[{B}Title Sort{d}]  "+t.slice[t.cursor].TitleSort)
+	t.a.drawString(0, 6, "{b}│ {C}2. {d}[{B}Collection{d}]  "+t.slice[t.cursor].Collection)
+	t.a.drawString(0, 7, "{b}│ {C}3. {d}[{B}Year{d}]        "+t.slice[t.cursor].Year)
+	t.a.drawString(0, 8, "{b}│ {C}4. {d}[{B}Future{d}]      "+t.slice[t.cursor].Future)
 	if t.entryType == "additional" {
-		t.a.drawString(0, 8, "{b}│ {C}4. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info1)
-		t.a.drawString(0, 9, "{b}*───*")
+		t.a.drawString(0, 9, "{b}│ {C}5. {d}[{B}Info{d}]     "+t.slice[t.cursor].Info)
+		t.a.drawString(0, 10, "{b}*───*")
 	} else if t.entryType == "episodic" {
-		t.a.drawString(0, 8, "{b}│ {C}4. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
-		t.a.drawString(0, 9, "{b}*───*")
+		t.a.drawString(0, 9, "{b}│ {C}5. {d}[{B}Episodes{d}] "+strconv.Itoa(t.slice[t.cursor].EpisodeTotal))
+		t.a.drawString(0, 10, "{b}*───*")
 	} else {
-		t.a.drawString(0, 8, "{b}*───*")
+		t.a.drawString(0, 9, "{b}*───*")
 	}
 }
 
@@ -360,7 +365,7 @@ func (t *EntriesTab) drawTagView() {
 		}
 		str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + year + "{d}] " + entry.Title
 		if t.entryType == "additional" {
-			str += " [" + entry.Info1 + "]"
+			str += " [" + entry.Info + "]"
 		} else if t.entryType == "episodic" {
 			str += " [" + strconv.Itoa(entry.EpisodeTotal) + "]"
 		}
@@ -408,7 +413,7 @@ func (t *EntriesTab) drawEntries() {
 
 			var str string
 			if t.entryType == "additional" {
-				info := entry.Info1
+				info := entry.Info
 				str = year + " " + title + " [{b}" + info + "{d}]"
 			} else if t.entryType == "episodic" {
 				episodeDone := strconv.Itoa(entry.EpisodeDone)
@@ -485,6 +490,8 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 		t.slice[t.cursor].Title = value
 	case 's':
 		t.slice[t.cursor].TitleSort = value
+	case 'c':
+		t.slice[t.cursor].Collection = value
 	case 'y':
 		t.slice[t.cursor].Year = value
 	case 'f':
@@ -495,7 +502,7 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 			t.slice[t.cursor].EpisodeTotal = episodeTotal
 		}
 	case 'i':
-		t.slice[t.cursor].Info1 = value
+		t.slice[t.cursor].Info = value
 	}
 
 	t.a.inputActive = false
@@ -589,7 +596,7 @@ func (t *EntriesTab) sort() {
 	}
 
 	info1 := func(e1, e2 *Entry) bool {
-		return e1.Info1 < e2.Info1
+		return e1.Info < e2.Info
 	}
 
 	By(title).Sort(t.slice)
@@ -610,20 +617,11 @@ func (t *EntriesTab) sort() {
 func (t *EntriesTab) refreshSlice() {
 	t.slice = t.slice[:0]
 	for i := range *t.entries {
-		if (*t.entries)[i].State == "passive" {
-			if t.view == "passive" || t.view == "all" {
-				t.slice = append(t.slice, &(*t.entries)[i])
-			}
-		} else if (*t.entries)[i].State == "inactive" {
-			if t.view == "inactive" || t.view == "all" {
-				t.slice = append(t.slice, &(*t.entries)[i])
-			}
-		} else {
-			if t.view == "active" || t.view == "all" {
-				t.slice = append(t.slice, &(*t.entries)[i])
-			}
+		if (*t.entries)[i].State == t.view || t.view == "all" {
+			t.slice = append(t.slice, &(*t.entries)[i])
 		}
 	}
+
 	t.sort()
 
 	if t.cursor > len(t.slice)-1 {

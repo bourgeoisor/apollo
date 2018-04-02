@@ -13,9 +13,10 @@ type Entry struct {
 	State        string
 	Year         string
 	TagID        string
-	Rating       int
 	Future       string
-	Info1        string
+	Info         string
+	Collection   string
+	Rating       int
 	EpisodeDone  int
 	EpisodeTotal int
 }

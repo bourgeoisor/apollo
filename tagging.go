@@ -177,7 +177,7 @@ func (t *EntriesTab) fetchGamesDBTags(body *[]byte) {
 					Title: data.Game[i].GameTitle,
 					Year:  releaseDate[2],
 					TagID: data.Game[i].id,
-					Info1: platforms[data.Game[i].Platform],
+					Info: platforms[data.Game[i].Platform],
 					State: t.entryState(),
 				})
 			}
@@ -217,7 +217,7 @@ func (t *EntriesTab) fetchGoogleBooksTags(body *[]byte) {
 			t.search = append(t.search, Entry{
 				Title: data.Items[i].VolumeInfo.Title,
 				TagID: data.Items[i].Id,
-				Info1: data.Items[i].VolumeInfo.Authors[0],
+				Info: data.Items[i].VolumeInfo.Authors[0],
 				State: t.entryState(),
 			})
 		}
