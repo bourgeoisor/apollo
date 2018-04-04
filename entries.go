@@ -4,9 +4,7 @@ import (
 	"github.com/nsf/termbox-go"
 	"io/ioutil"
 	"os"
-	"sort"
 	"strconv"
-	"strings"
 )
 
 // EntriesTab is a tab for displaying entries implementing Tabber.
@@ -532,81 +530,16 @@ func (t *EntriesTab) Query(query string) {
 	}
 }
 
-// By is the helper type used to sort entries.
-type By func(e1, e2 *Entry) bool
-
-// Sort creates an EntrySorter and sorts the entries.
-func (by By) Sort(entries []*Entry) {
-	es := &entrySorter{
-		entries: entries,
-		by:      by,
-	}
-	sort.Sort(es)
-}
-
-// EntrySorter is the structure that contains the entries to be sorted and the function
-// used to sort them.
-type entrySorter struct {
-	entries []*Entry
-	by      func(e1, e2 *Entry) bool
-}
-
-// Len returns the length of a slice of entries.
-func (s *entrySorter) Len() int {
-	return len(s.entries)
-}
-
-// Swap changes the position of two different entries in a slice.
-func (s *entrySorter) Swap(i, j int) {
-	s.entries[i], s.entries[j] = s.entries[j], s.entries[i]
-}
-
-// Less returns if an entry is lesser than another entry.
-func (s *entrySorter) Less(i, j int) bool {
-	return s.by(s.entries[i], s.entries[j])
-}
-
 // Sort takes a slice and sorts it according to the sort option toggled.
 func (t *EntriesTab) sort() {
-
-	title := func(e1, e2 *Entry) bool {
-		s1 := strings.Replace(e1.Title, "The ", "", 1)
-		if e1.TitleSort != "" {
-			s1 = strings.Replace(e1.TitleSort, "The ", "", 1)
-		}
-
-		s2 := strings.Replace(e2.Title, "The ", "", 1)
-		if e2.TitleSort != "" {
-			s2 = strings.Replace(e2.TitleSort, "The ", "", 1)
-		}
-
-		if strings.ToLower(s1) == strings.ToLower(s2) {
-			return e1.Year < e2.Year
-		} else {
-			return strings.ToLower(s1) < strings.ToLower(s2)
-		}
-	}
-
-	year := func(e1, e2 *Entry) bool {
-		return e1.Year < e2.Year
-	}
-
-	rating := func(e1, e2 *Entry) bool {
-		return e1.Rating > e2.Rating
-	}
-
-	info1 := func(e1, e2 *Entry) bool {
-		return e1.Info < e2.Info
-	}
-
-	By(title).Sort(t.slice)
+	By(titleSortFunc).Sort(t.slice)
 
 	if t.sortField == "year" {
-		By(year).Sort(t.slice)
+		By(yearSortFunc).Sort(t.slice)
 	} else if t.sortField == "rating" {
-		By(rating).Sort(t.slice)
+		By(ratingSortFunc).Sort(t.slice)
 	} else if t.sortField != "title" {
-		By(info1).Sort(t.slice)
+		By(infoSortFunc).Sort(t.slice)
 	}
 
 	t.status = t.name + " - " + t.view + " (" + strconv.Itoa(len(t.slice)) +
