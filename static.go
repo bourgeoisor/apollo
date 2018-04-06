@@ -145,8 +145,9 @@ func (a *Apollo) printDetailedHelp(subject string) {
 			"{b}│ {d}t..............Tag the current entry",
 			"{b}│ {d}r..............Toggle ratings",
 			"{b}│ {d}a..............Toggle the current entry's state",
-			"{b}│ {d}z/x............Change the rating of the current entry",
-			"{b}│ {d}c/v............Change the current episode of an entry",
+			"{b}│ {d}[/]............Change the rating of the current entry",
+			"{b}│ {d}Up/Down........Scroll through the entries",
+			"{b}│ {d}Left/Right.....Change the current episode of an entry",
 			"{b}│ {d}p..............Print the current entries to a file",
 			"{b}*───*",
 		}
