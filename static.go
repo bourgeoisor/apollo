@@ -8,7 +8,7 @@ import (
 )
 
 // Version is the version number of the application.
-const version = "Apollo v1.0.0"
+const version = "Apollo v1.1.0"
 
 // Create a configuration directory for Unis systems.
 func makeUnixConfigDir() {
@@ -142,7 +142,6 @@ func (a *Apollo) printDetailedHelp(subject string) {
 			"{b}│ {d}s..............Sort the entries",
 			"{b}│ {d}D..............Delete the current entry",
 			"{b}│ {d}e..............Edit the current entry",
-			"{b}│ {d}t..............Tag the current entry",
 			"{b}│ {d}r..............Toggle ratings",
 			"{b}│ {d}a..............Toggle the current entry's state",
 			"{b}│ {d}[/]............Change the rating of the current entry",

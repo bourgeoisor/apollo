@@ -23,11 +23,10 @@ type EntriesTab struct {
 	search          []Entry
 	additionalField string
 	entryType       string
-	taggingAPI      string
 }
 
 // NewEntriesTab creates a new EntriesTab and returns it.
-func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, additionalField string, taggingAPI string) *EntriesTab {
+func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, additionalField string) *EntriesTab {
 	t := &EntriesTab{
 		a:               a,
 		entries:         entries,
@@ -36,7 +35,6 @@ func newEntriesTab(a *Apollo, entries *[]Entry, name string, entryType string, a
 		view:            "passive",
 		entryType:       entryType,
 		additionalField: additionalField,
-		taggingAPI:      taggingAPI,
 	}
 
 	if t.a.c.get("rating-startup") == "true" {
@@ -165,35 +163,6 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 				t.a.inputCursor = len(t.a.input)
 			}
 		}
-	} else if t.view == "tag" {
-		if ev.Ch == 'q' {
-			t.search = t.search[:0]
-			t.view = t.pastView
-		}
-
-		indexes := map[rune]int{'0': 0, '1': 1, '2': 2, '3': 3,
-			'4': 4, '5': 5, '6': 6, '7': 7,
-			'8': 8, '9': 9}
-		if i, exist := indexes[ev.Ch]; exist {
-			if i < len(t.search) {
-				t.view = t.pastView
-				*t.slice[t.cursor] = t.search[i]
-				t.refreshSlice()
-
-				for j, e := range t.slice {
-					if *e == t.search[i] {
-						t.cursor = j
-						t.offset = 0
-						if t.cursor > t.a.height-4 {
-							t.offset = t.cursor - (t.a.height - 4)
-						}
-					}
-				}
-				t.search = t.search[:0]
-				t.a.d.save()
-			}
-		}
-
 	} else {
 		switch ev.Ch {
 		case '1':
@@ -222,10 +191,6 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			if len(t.slice) > 0 {
 				t.pastView = t.view
 				t.view = "edit"
-			}
-		case 't':
-			if len(t.slice) > 0 {
-				t.fetchTags()
 			}
 		case 'r':
 			t.ratings = !t.ratings
@@ -349,29 +314,6 @@ func (t *EntriesTab) drawEditView() {
 	}
 }
 
-// DrawTagView draws the tag view on the terminal.
-func (t *EntriesTab) drawTagView() {
-	t.a.drawString(0, 1, "{b}*───( Tagging Entry )───")
-	t.a.drawString(0, 2, "{b}│ {C}q. {d}Cancel tagging.")
-	t.a.drawString(0, 3, "{b}│")
-	for j := 0; j < len(t.search); j++ {
-			entry := t.search[j]
-
-		year := entry.Year
-		if year == "" {
-			year = "----"
-		}
-		str := "{b}│ {C}" + strconv.Itoa(j) + ". {d}[{B}" + year + "{d}] " + entry.Title
-		if t.entryType == "additional" {
-			str += " [" + entry.Info + "]"
-		} else if t.entryType == "episodic" {
-			str += " [" + strconv.Itoa(entry.EpisodeTotal) + "]"
-		}
-		t.a.drawString(0, j+4, str)
-	}
-	t.a.drawString(0, len(t.search)+4, "{b}*───*")
-}
-
 // DrawEntries draws all the entries of the view on the terminal.
 func (t *EntriesTab) drawEntries() {
 	for j := 0; j < t.a.height-3; j++ {
@@ -456,8 +398,6 @@ func (t *EntriesTab) drawEntries() {
 func (t *EntriesTab) Draw() {
 	if t.view == "edit" {
 		t.drawEditView()
-	} else if t.view == "tag" {
-		t.drawTagView()
 	} else {
 		t.drawEntries()
 	}
@@ -506,6 +446,14 @@ func (t *EntriesTab) editCurrentEntry(field rune, value string) {
 	t.a.inputActive = false
 }
 
+// EntryState returns the current view, or returns "passive" if the view is "all".
+func (t *EntriesTab) entryState() string {
+	if t.view == "all" {
+		return "passive"
+	}
+	return t.view
+}
+
 // Query processes the user input and calls the correct function.
 func (t *EntriesTab) Query(query string) {
 	if query[0] == ':' {
@@ -523,10 +471,7 @@ func (t *EntriesTab) Query(query string) {
 		}
 	} else {
 		t.appendEntry(Entry{Title: query, State: t.entryState()})
-		if t.a.c.get("auto-tag") == "true" {
-			t.a.inputActive = false
-			t.fetchTags()
-		}
+		t.a.inputActive = false
 	}
 }
 

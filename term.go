@@ -289,15 +289,15 @@ func (a *Apollo) openTab(name string) error {
 
 	switch name {
 	case "movies":
-		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Movies, "movies", "default", "", "omdb")))
+		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Movies, "movies", "default", "")))
 	case "series":
-		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Series, "series", "episodic", "", "omdb")))
+		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Series, "series", "episodic", "")))
 	case "anime":
-		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Anime, "anime", "episodic", "", "hummingbird")))
+		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Anime, "anime", "episodic", "")))
 	case "games":
-		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Games, "games", "additional", "platform", "gamesdb")))
+		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Games, "games", "additional", "platform")))
 	case "books":
-		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Books, "books", "additional", "author", "googlebooks")))
+		a.tabs = append(a.tabs, Tabber(newEntriesTab(a, &a.d.Books, "books", "additional", "author")))
 	default:
 		return errors.New("term: tab does not exist")
 	}
