@@ -60,7 +60,11 @@ func titleSortFunc(e1, e2 *Entry) bool {
 
 // Sorting function used to sort entries by year.
 func yearSortFunc(e1, e2 *Entry) bool {
-	return e1.Year < e2.Year
+	if e1.Year == e2.Year {
+		return strings.ToLower(e1.Title) < strings.ToLower(e2.Title)
+	} else {
+		return e1.Year < e2.Year
+	}
 }
 
 // Sorting function used to sort entries by rating.

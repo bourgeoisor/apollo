@@ -17,6 +17,7 @@ type EntriesTab struct {
 	sortField       string
 	view            string
 	pastView        string
+	collectionView  string
 	offset          int
 	cursor          int
 	ratings         bool
@@ -173,6 +174,8 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			t.changeView("inactive")
 		case '4':
 			t.changeView("all")
+		case 'p':
+			t.printEntriesToFile()
 		case 's':
 			t.toggleSort()
 		case 'D':
@@ -194,6 +197,15 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 			}
 		case 'r':
 			t.ratings = !t.ratings
+		case 't':
+			if t.collectionView == "" {
+				t.collectionView = t.slice[t.cursor].Collection
+			} else {
+				t.collectionView = ""
+			}
+			t.cursor = 0
+			t.offset = 0
+			t.refreshSlice()
 		case 'a':
 			if len(t.slice) > 0 {
 				if t.slice[t.cursor].State == "passive" {
@@ -220,8 +232,6 @@ func (t *EntriesTab) HandleKeyEvent(ev *termbox.Event) {
 					t.a.d.save()
 				}
 			}
-		case 'p':
-			t.printEntriesToFile()
 		}
 
 		switch ev.Key {
@@ -487,15 +497,20 @@ func (t *EntriesTab) sort() {
 		By(infoSortFunc).Sort(t.slice)
 	}
 
-	t.status = t.name + " - " + t.view + " (" + strconv.Itoa(len(t.slice)) +
-		" entries) sorted by " + t.sortField
+	t.status = t.name + " - " + t.view + " (" + strconv.Itoa(len(t.slice)) + " entries) sorted by " + t.sortField
+
+	if t.collectionView != "" {
+		t.status += " - " + t.collectionView
+	}
 }
 
 // RefreshSlice sorts the current slice of entries according to which sort is toggled.
 func (t *EntriesTab) refreshSlice() {
 	t.slice = t.slice[:0]
 	for i := range *t.entries {
-		if (*t.entries)[i].State == t.view || t.view == "all" {
+		state := (*t.entries)[i].State
+		collection := (*t.entries)[i].Collection
+		if (state == t.view || t.view == "all") && (collection == t.collectionView || t.collectionView == "") {
 			t.slice = append(t.slice, &(*t.entries)[i])
 		}
 	}
