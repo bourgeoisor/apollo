@@ -39,26 +39,16 @@ func (s *entrySorter) Less(i, j int) bool {
 	return s.by(s.entries[i], s.entries[j])
 }
 
-// Removes common words from the prefix of title strings.
-func cleanTitlePrefix(str string) string {
-	newStr := str
-
-	newStr = strings.Replace(newStr, "The ", "", 1)
-	newStr = strings.Replace(newStr, "A ", "", 1)
-
-	return newStr
-}
-
 // Sorting function used to sort entries by title.
 func titleSortFunc(e1, e2 *Entry) bool {
-	s1 := cleanTitlePrefix(e1.Title)
+	s1 := e1.Title
 	if e1.TitleSort != "" {
-		s1 = cleanTitlePrefix(e1.TitleSort)
+		s1 = e1.TitleSort
 	}
 
-	s2 := cleanTitlePrefix(e2.Title)
+	s2 := e2.Title
 	if e2.TitleSort != "" {
-		s2 = cleanTitlePrefix(e2.TitleSort)
+		s2 = e2.TitleSort
 	}
 
 	if strings.ToLower(s1) == strings.ToLower(s2) {
